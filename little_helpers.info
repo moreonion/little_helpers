@@ -1,0 +1,6 @@
+name = Little helpers
+core = 7.x
+project = little_helpers
+
+dependencies[] = field
+
