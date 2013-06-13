@@ -2,6 +2,9 @@
 
 namespace Drupal\little_helpers\Field;
 
+/**
+ * OOP-wrapper for the data-structure used by field_*_field() functions.
+ */
 class Field {
   protected $id = NULL;
   public $entity_types = array();
@@ -48,6 +51,9 @@ class Field {
 
   /**
    * Save field configuration to database.
+   * 
+   * @see \field_update_field().
+   * @see \field_create_field().
    */
   public function save() {
     if ($this->data['id']) {
@@ -55,5 +61,15 @@ class Field {
     } else {
       $this->data = \field_create_field((array) $this);
     }
+    return $this;
+  }
+
+  /**
+   * Delete an existing field.
+   *
+   * @see \field_delete_field().
+   */
+  public function delete() {
+    field_delete_field($this->field_name);
   }
 }
