@@ -6,7 +6,7 @@ namespace Drupal\little_helpers\Field;
  * OOP-wrapper for the data-structure used by field_*_field() functions.
  */
 class Field {
-  protected $id = NULL;
+  public $id = NULL;
   public $entity_types = array();
   public $field_name;
   public $type;
@@ -56,10 +56,12 @@ class Field {
    * @see \field_create_field().
    */
   public function save() {
-    if ($this->data['id']) {
+    if (isset($this->id)) {
       \field_update_field((array) $this);
     } else {
-      $this->data = \field_create_field((array) $this);
+      foreach (\field_create_field((array) $this) as $k => $v) {
+        $this->$k = $v;
+      }
     }
     return $this;
   }
