@@ -99,24 +99,35 @@ class Instance {
   }
   
   /**
+   * Convert this object to an array suitable
+   * for the Drupal Field-API.
+   */
+  public function export() {
+    $data = (array) $this;
+    if (isset($data['field'])) {
+      unset($data['field']);
+      $data['field_name'] = $this->field->field_name;
+      $data['field_id'] = $this->field->id;
+    }
+    if (isset($data['bundle'])) {
+      unset($data['bundle']);
+      $data['bundle'] = $this->bundle->getBundleName();
+      $data['entity_type'] = $this->bundle->getEntityType();
+    }
+    return $data;
+  }
+  
+  /**
    * Save field instance to database.
    * 
    * @see \field_update_instance().
    * @see \field_create_instance().
    */
   public function save() {
-    $data = (array) $this;
-    unset($data['field']);
-    $data['field_name'] = $this->field->field_name;
-    $data['field_id'] = $this->field->id;
-    unset($data['bundle']);
-    $data['bundle'] = $this->bundle->getBundleName();
-    $data['entity_type'] = $this->bundle->getEntityType();
-
     if (isset($this->id)) {
-      \field_update_instance($data);
+      \field_update_instance($this->export());
     } else {
-      foreach (\field_create_instance($data) as $k => $v) {
+      foreach (\field_create_instance($this->export()) as $k => $v) {
         $this->$k = $v;
       }
     }
@@ -129,11 +140,6 @@ class Instance {
    * @see \field_delete_instance().
    */
   public function delete() {
-    $instance = array(
-      'field_name' => $this->field->field_name,
-      'entity_type' => $this->bundle->getEntityType(),
-      'bundle' => $this->bundle->getBundleName(),
-    );
-    \field_delete_instance($instance);
+    \field_delete_instance($this->export());
   }
 }
