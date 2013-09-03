@@ -36,13 +36,15 @@ class Instance {
     return new $class($data);
   }
   
-  public static function fromField(Field $field, Bundle $bundle = NULL) {
-    $data = array();
+  public static function fromField(Field $field, Bundle $bundle = NULL, $data = array()) {
+    $data = array('field' => $field, 'bundle' => $bundle) + $data;
     $class = \get_called_class();
     $instance = new $class($data);
-    $instance->setField($field);
-    $instance->bundle = $bundle;
     return $instance;
+  }
+  
+  public static function fromNames($fieldname, $entity_type, $bundle, $data = array()) {
+    return self::fromField(Field::byName($fieldname), new Bundle($entity_type, $bundle), $data);
   }
   
   /**
@@ -55,7 +57,7 @@ class Instance {
     $this->settings += \field_info_instance_settings($field->type);
     $field_type = \field_info_field_types($field->type);
     if (!isset($this->widget['type'])) {
-      $this->setWidgetType($field_type['default_widget']);
+      $this->setWidget($field_type['default_widget']);
     }
     foreach ($this->display as $view_mode => &$settings) {
       if (!isset($settings['type'])) {
@@ -69,10 +71,9 @@ class Instance {
    *
    * @see _field_write_instance().
    */
-  public function setFormatter($view_mode, $formatter_name) {
+  public function setFormatter($view_mode, $formatter_name, $settings = array()) {
+    $this->display[$view_mode] = $settings;
     $display = &$this->display[$view_mode];
-    if (!$display)
-      $display = array();
     $display += array(
       'label' => 'above',
       'type' => $formatter_name,
@@ -90,9 +91,9 @@ class Instance {
    *
    * @see _field_write_instance().
    */
-  public function setWidgetType($widget_type_name) {
+  public function setWidget($widget_type_name, $settings = array()) {
     $this->widget['type'] = $widget_type_name;
-    $this->widget['settings'] = array();
+    $this->widget['settings'] = $settings;
     $widget_type = \field_info_widget_types($widget_type_name);
     $this->widget['module'] = $widget_type['module'];
     $this->widget['settings'] += \field_info_widget_settings($widget_type_name);

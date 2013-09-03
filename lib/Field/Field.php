@@ -24,9 +24,9 @@ class Field {
     return new $class(\field_read_field($name));
   }
 
-  public static function fromType($type) {
+  public static function fromType($type, $name = NULL) {
     $class = \get_called_class();
-    $new = new $class(array());
+    $new = new $class(array('field_name' => $name));
     $new->setType($type);
     return $new;
   }
