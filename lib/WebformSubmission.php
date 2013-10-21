@@ -2,6 +2,8 @@
 
 namespace Drupal\little_helpers;
 
+module_load_include('inc', 'webform', 'includes/webform.submissions');
+
 class WebformSubmission {
   protected $node;
   protected $submission;
@@ -35,5 +37,19 @@ class WebformSubmission {
     if (isset($this->webform['cids'][$form_key])) {
       return $this->submission->data[$this->webform['cids'][$form_key]]['value'][0];
     }
+  }
+
+  public function unwrap() {
+    return $this->submission;
+  }
+
+  public function __sleep() {
+    $this->nid = $this->node->nid;
+    $this->sid = $this->submission->sid;
+    return array('nid', 'sid');
+  }
+
+  public function __wakeup() {
+    $this->__construct(node_load($this->nid), webform_get_submission($this->nid, $this->sid));
   }
 }
