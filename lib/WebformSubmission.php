@@ -39,6 +39,12 @@ class WebformSubmission {
     }
   }
 
+  public function componentByKey($form_key) {
+    if (isset($this->webform['cids'][$form_key])) {
+      return $this->webform['components'][$this->webform['cids'][$form_key]];
+    }
+  }
+
   public function unwrap() {
     return $this->submission;
   }
