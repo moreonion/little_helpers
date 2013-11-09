@@ -33,6 +33,10 @@ class WebformSubmission {
     $this->remote_addr = $submission->remote_addr;
   }
 
+  public function getNode() {
+    return $this->node;
+  }
+
   public function valueByKey($form_key) {
     if (isset($this->webform['cids'][$form_key])) {
       return $this->submission->data[$this->webform['cids'][$form_key]]['value'][0];
