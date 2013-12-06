@@ -3,8 +3,8 @@
 namespace Drupal\little_helpers;
 
 class Webform {
-  protected $node;
-  protected $nid;
+  public $node;
+  public $nid;
 
   public function __construct($node) {
     $this->node = $node;
