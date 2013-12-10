@@ -49,6 +49,28 @@ class WebformSubmission {
     }
   }
 
+  public function componentsByType($type) {
+    $components = array();
+    foreach ($this->webform['components'] as $cid => &$c) {
+      if ($c['type'] == $type) {
+        $components[$cid] = &$c;
+      }
+    }
+    return $components;
+  }
+
+  public function valuesByType($type) {
+    $values = array();
+    foreach (array_keys($this->componentsByType($type)) as $cid) {
+      $values[$cid] = $this->submission->data[$cid]['value'][0];
+    }
+    return $values;
+  }
+
+  public function valueByCid($cid) {
+    return $this->submission->data[$cid]['value'][0];
+  }
+
   public function unwrap() {
     return $this->submission;
   }
