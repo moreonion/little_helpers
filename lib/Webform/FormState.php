@@ -3,10 +3,9 @@
  * @file
  */
 
-namespace Drupal\little_helpers;
-use Drupal\little_helpers\Interfaces as LHI;
+namespace Drupal\little_helpers\Webform;
 
-class WebformFormState {
+class FormState {
   protected $node;
   protected $formState;
 

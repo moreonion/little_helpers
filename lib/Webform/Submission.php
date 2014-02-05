@@ -21,13 +21,7 @@ class WebformSubmission {
   public function __construct($node, $submission) {
     $this->submission = $submission;
     $this->node    = $node;
-    $this->webform = &$node->webform;
-
-    if (!isset($this->webform['cids'])) {
-      foreach ($this->webform['components'] as $component) {
-        $this->webform['cids'][$component['form_key']] = (int) $component['cid'];
-      }
-    }
+    $this->webform = new Webform($node);
 
     $this->submitted = $submission->submitted;
     $this->remote_addr = $submission->remote_addr;
@@ -38,32 +32,16 @@ class WebformSubmission {
   }
 
   public function valueByKey($form_key) {
-    if (isset($this->webform['cids'][$form_key])) {
-      return $this->submission->data[$this->webform['cids'][$form_key]]['value'][0];
+    if ($component = &$this->webform->componentByKey($form_key)) {
+      return $this->submission->data[$component['cid']]['value'][0];
     }
   }
 
   public function valuesByKey($form_key) {
-    if (isset($this->webform['cids'][$form_key])) {
-      return $this->submission->data[$this->webform['cids'][$form_key]]['value'];
+    if ($component = &$this->webform->componentByKey($form_key)) {
+      return $this->submission->data[$component['cid']]['value'];
     }
-  }
-
-  public function componentByKey($form_key) {
-    if (isset($this->webform['cids'][$form_key])) {
-      return $this->webform['components'][$this->webform['cids'][$form_key]];
-    }
-  }
-
-  public function componentsByType($type) {
-    $components = array();
-    foreach ($this->webform['components'] as $cid => &$c) {
-      if ($c['type'] == $type) {
-        $components[$cid] = &$c;
-      }
-    }
-    return $components;
-  }
+  } 
 
   public function valuesByType($type) {
     $values = array();
