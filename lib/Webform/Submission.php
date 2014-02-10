@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\little_helpers;
+namespace Drupal\little_helpers\Webform;
 
 module_load_include('inc', 'webform', 'includes/webform.submissions');
 
-class WebformSubmission {
+class Submission {
   protected $node;
   protected $submission;
-  protected $webform;
+  public $webform;
 
   public $remote_addr;
   public $submitted;
@@ -53,6 +53,10 @@ class WebformSubmission {
 
   public function valueByCid($cid) {
     return $this->submission->data[$cid]['value'][0];
+  }
+
+  public function valuesByCid($cid) {
+    return $this->submission->data[$cid]['value'];
   }
 
   public function unwrap() {

@@ -34,6 +34,9 @@ class Webform {
     if (isset($this->webform['cids'][$form_key])) {
       return $this->webform['components'][$this->webform['cids'][$form_key]];
     }
+    // Make return by reference work.
+    $return = array();
+    return $return;
   }
 
   /**
@@ -109,6 +112,20 @@ class Webform {
     } else {
       return $redirect;
     }
+  }
+
+  /**
+   * Check if webform_confirm_email is active and this submission has to
+   * be confirmed.
+   *
+   * @return bool
+   */
+  public function needsConfirmation() {
+    if (!module_exists('webform_confirm_email')) {
+      return FALSE;
+    }
+    $result = db_query('SELECT eid FROM {webform_confirm_email} WHERE email_type=1');
+    return (bool) $result->fetch();
   }
 
   public function __sleep() {
