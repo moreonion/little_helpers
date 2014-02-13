@@ -43,7 +43,7 @@ class FormState {
 
   public function valueByKey($form_key) {
     if ($component = $this->webform->componentByKey($form_key)) {
-      return $this->getFormStateValue($component);
+      return $this->formStateValue($component);
     }
   }
 
