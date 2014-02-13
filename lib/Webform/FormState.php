@@ -72,8 +72,8 @@ class FormState {
   }
 
   public function getSubmission() {
-    if (isset($this->form_state['values']['details']['sid'])) {
-      return Submission::load($this->webform->node->nid, $this->form_state['values']['details']['sid']);
+    if (isset($this->formState['values']['details']['sid'])) {
+      return Submission::load($this->node->nid, $this->formState['values']['details']['sid']);
     }
   }
 }
