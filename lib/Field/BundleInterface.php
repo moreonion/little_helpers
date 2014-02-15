@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\little_helpers\Interfaces;
+namespace Drupal\little_helpers\Field;
 
-interface Bundle {
+interface BundleInterface {
   public function getEntityType();
   public function getBundleName();
 }

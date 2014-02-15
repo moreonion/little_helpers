@@ -2,8 +2,6 @@
 
 namespace Drupal\little_helpers\Field;
 
-use \Drupal\little_helpers\Interfaces;
-
 class Instance {
   public $id = NULL;
   public $field;
@@ -36,7 +34,7 @@ class Instance {
     return new $class($data);
   }
   
-  public static function fromField(Field $field, Bundle $bundle = NULL, $data = array()) {
+  public static function fromField(Field $field, BundleInterface $bundle = NULL, $data = array()) {
     $data = array('field' => $field, 'bundle' => $bundle) + $data;
     $class = \get_called_class();
     $instance = new $class($data);

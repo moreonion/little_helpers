@@ -2,7 +2,7 @@
 
 namespace Drupal\little_helpers\Field;
 
-class Bundle implements \Drupal\little_helpers\Interfaces\Bundle {
+class Bundle implements BundleInterface {
   protected $entity_type;
   protected $bundle;
   public function __construct($entity_type, $bundle) {
