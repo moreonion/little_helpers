@@ -9,28 +9,36 @@ abstract class Model {
   protected static $serial = TRUE;
   protected static $serialize = array();
 
-  public function __construct($data = array()) {
+  protected $new = TRUE;
+
+  public function __construct($data = array(), $new = TRUE) {
     foreach ($data as $k => $v) {
       $this->$k = (is_string($v) && !empty(static::$serialize[$k])) ? unserialize($v) : $v;
     }
+    $this->new = $new;
   }
 
   public function isNew() {
-    foreach (static::$key as $key) {
-      if (isset($this->{$key})) {
-        return FALSE;
+    if (!$this->new) {
+      return FALSE;
+    }
+    if (static::$serial) {
+      foreach (static::$key as $key) {
+        if (isset($this->{$key})) {
+          return FALSE;
+        }
       }
     }
     return TRUE;
   }
 
   public function save() {
-    $new = TRUE;
     if ($this->isNew()) {
       $this->insert();
     } else {
       $this->update();
     }
+    $this->new = FALSE;
   }
 
   protected function update() {
@@ -53,6 +61,13 @@ abstract class Model {
     if (static::$serial) {
       $this->{static::$key[0]} = $ret;
     }
+  }
+
+  public function delete() {
+    $query = db_delete(static::$table);
+    $query->conditions($this->values(static::$key));
+    $query->execute();
+    $this->new = TRUE;
   }
 
   protected function values($keys) {
