@@ -8,11 +8,16 @@ namespace Drupal\little_helpers\Webform;
 class FormState {
   protected $node;
   protected $formState;
+  public $webform;
 
   public function __construct($node, array &$form_state) {
     $this->node = $node;
     $this->webform = new Webform($node);
     $this->formState = &$form_state;
+  }
+
+  public function getNode() {
+    return $this->node;
   }
 
   protected function formStateValue(&$component) {
