@@ -65,7 +65,9 @@ abstract class Model {
 
   public function delete() {
     $query = db_delete(static::$table);
-    $query->conditions($this->values(static::$key));
+    foreach ($this->values(static::$key) as $field => $value) {
+      $query->condition($field, $value);
+    }
     $query->execute();
     $this->new = TRUE;
   }
