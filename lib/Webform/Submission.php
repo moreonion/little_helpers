@@ -25,6 +25,13 @@ class Submission {
 
     $this->submitted = $submission->submitted;
     $this->remote_addr = $submission->remote_addr;
+
+    if (!isset($submission->tracking)) {
+      $submission->tracking = array();
+      if (module_exists('webform_tracking')) {
+        webform_tracking_load($submission);
+      }
+    }
   }
 
   public function getNode() {
@@ -35,11 +42,17 @@ class Submission {
     if ($component = &$this->webform->componentByKey($form_key)) {
       return $this->submission->data[$component['cid']]['value'][0];
     }
+    elseif (isset($this->submission->tracking->$form_key)) {
+      return $this->submission->tracking->$form_key;
+    }
   }
 
   public function valuesByKey($form_key) {
     if ($component = &$this->webform->componentByKey($form_key)) {
       return $this->submission->data[$component['cid']]['value'];
+    }
+    elseif (isset($this->submission->tracking[$form_key])) {
+      return $this->submission->tracking[$form_key];
     }
   } 
 
