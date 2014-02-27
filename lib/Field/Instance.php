@@ -12,10 +12,10 @@ class Instance {
   public $display = array('default' => array());
   public $widget = array();
   public $required = FALSE;
-  public $label = NULL;
+  public $label = '';
   public $description = '';
   public $deleted = 0;
-  
+
   public function __construct($data) {
     foreach ($data as $k => $v) {
       $this->$k = $v;
@@ -26,14 +26,17 @@ class Instance {
     if (isset($this->field)) {
       $this->setField($this->field);
     }
+    if (empty($this->label)) {
+      $this->label = $this->field->field_name;
+    }
   }
-  
+
   public static function load($field_name, $entity_type, $bundle) {
     $data = \field_read_instance($entity_type, $field_name, $bundle);
     $class = \get_called_class();
     return new $class($data);
   }
-  
+
   public static function fromField(Field $field, BundleInterface $bundle = NULL, $data = array()) {
     $data = array('field' => $field, 'bundle' => $bundle) + $data;
     $class = \get_called_class();
