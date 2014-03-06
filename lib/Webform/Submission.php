@@ -18,6 +18,33 @@ class Submission {
     return new static($node, $submission);
   }
 
+  /**
+   * Construct a submission object from a form_state like
+   * @see webform_client_form_submit() does.
+   */
+  public static function fromFormState($node, &$form_state) {
+    $is_draft = (int) !empty($form_state['save_draft']);
+    $sid = $form_state['values']['details']['sid'] ? (int) $form_state['values']['details']['sid'] : NULL;
+    $data = webform_submission_data($node, $form_state['values']['submitted']);
+
+    if (!$sid) {
+      $submission = new static($node, (object) array(
+        'nid' => $node->nid,
+        'uid' => $form_state['values']['details']['uid'],
+        'submitted' => REQUEST_TIME,
+        'remote_addr' => ip_address(),
+        'is_draft' => $is_draft,
+        'data' => $data,
+      ));
+    }
+    else {
+      $submission = static::load($node->webform['nid'], $sid);
+      $submission->is_draft = $is_draft;
+      $submission->data = $data + $submission->data;
+    }
+    return $submission;
+  }
+
   public function __construct($node, $submission) {
     $this->submission = $submission;
     $this->node    = $node;
