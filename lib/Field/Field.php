@@ -21,7 +21,10 @@ class Field {
 
   public static function byName($name) {
     $class = \get_called_class();
-    return new $class(\field_read_field($name));
+    if ($data = \field_read_field($name)) {
+      return new $class($data);
+    }
+    return FALSE;
   }
 
   public static function fromType($type, $name = NULL) {
@@ -73,5 +76,30 @@ class Field {
    */
   public function delete() {
     field_delete_field($this->field_name);
+  }
+
+  /**
+   * Change the machine name of an existing field.
+   *
+   * @param $newName string
+   *
+   * NOTE: This might need additional adjustments for contrib modules
+   *   that store field_names (ie. views, context, cck_blocks).
+   */
+  public function rename($newName) {
+    $o = $this->field_name;
+    $n = $newName;
+    db_query("UPDATE field_config SET field_name='$n' WHERE field_name='$o'");
+    db_query("UPDATE field_config_instance SET field_name='$n' WHERE field_name='$o'");
+    db_query("RENAME TABLE `field_data_$o` TO `field_data_$n`;");
+    db_query("RENAME TABLE `field_revision_$o` TO `field_revision_$n`;");
+    \module_load_install($this->module);
+    $function = $this->module . '_field_schema';
+    $schema = $function(array('type' => $this->type));
+    foreach ($schema['columns'] as $column => $specs) {
+      db_change_field("field_data_$n", "{$o}_{$column}", "{$n}_{$column}", $specs);
+      db_change_field("field_revision_$n", "{$o}_{$column}", "{$n}_{$column}", $specs);
+    }
+    $this->field_name = $n;
   }
 }
