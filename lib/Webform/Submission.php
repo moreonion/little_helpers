@@ -78,10 +78,10 @@ class Submission {
     if ($component = &$this->webform->componentByKey($form_key)) {
       return $this->submission->data[$component['cid']]['value'];
     }
-    elseif (isset($this->submission->tracking[$form_key])) {
-      return $this->submission->tracking[$form_key];
+    elseif (isset($this->submission->tracking->$form_key)) {
+      return $this->submission->tracking->$form_key;
     }
-  } 
+  }
 
   public function valuesByType($type) {
     $values = array();
