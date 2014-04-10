@@ -9,9 +9,9 @@ abstract class Model {
   protected static $serial = TRUE;
   protected static $serialize = array();
 
-  protected $new = TRUE;
+  protected $new = FALSE;
 
-  public function __construct($data = array(), $new = TRUE) {
+  public function __construct($data = array(), $new = FALSE) {
     foreach ($data as $k => $v) {
       $this->$k = (is_string($v) && !empty(static::$serialize[$k])) ? unserialize($v) : $v;
     }
