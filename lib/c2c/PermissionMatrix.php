@@ -39,13 +39,13 @@ class PermissionMatrix {
 
     $index_to_rid = array();
     foreach ($roles as $role) {
-      $index_to_rid[] = $sys_roles[$role];
+      $index_to_rid[] = isset($sys_roles[$role]) ? $sys_roles[$role] : FALSE;
     }
 
     foreach ($matrix as $module => $perms) {
       foreach ($perms as $perm => $vals) {
         foreach ($vals as $col => $val) {
-          if (isset($val)) {
+          if (isset($val) && $index_to_rid[$col]) {
             $roles_perms[$index_to_rid[$col]][$module][$perm] = $val;
           }
         }
