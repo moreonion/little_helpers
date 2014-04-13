@@ -11,7 +11,7 @@ abstract class Model {
 
   protected $new = FALSE;
 
-  public function __construct($data = array(), $new = FALSE) {
+  public function __construct($data = array(), $new = TRUE) {
     foreach ($data as $k => $v) {
       $this->$k = (is_string($v) && !empty(static::$serialize[$k])) ? unserialize($v) : $v;
     }
