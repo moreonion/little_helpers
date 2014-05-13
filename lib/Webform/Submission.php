@@ -22,15 +22,19 @@ class Submission {
    * Construct a submission object from a form_state like
    * @see webform_client_form_submit() does.
    */
-  public static function fromFormState($node, &$form_state) {
-    $is_draft = (int) !empty($form_state['save_draft']);
-    $sid = $form_state['values']['details']['sid'] ? (int) $form_state['values']['details']['sid'] : NULL;
-    $data = webform_submission_data($node, $form_state['values']['submitted']);
+  public static function fromFormState($node, $form, &$form_state) {
+    $fs = $form_state;
+    if (!isset($fs['values']['submitted_tree'])) {
+      webform_client_form_pages($form, $fs);
+    }
+    $is_draft = (int) !empty($fs['save_draft']);
+    $sid = $fs['values']['details']['sid'] ? (int) $fs['values']['details']['sid'] : NULL;
+    $data = webform_submission_data($node, $fs['values']['submitted']);
 
     if (!$sid) {
       $submission = new static($node, (object) array(
         'nid' => $node->nid,
-        'uid' => $form_state['values']['details']['uid'],
+        'uid' => $fs['values']['details']['uid'],
         'submitted' => REQUEST_TIME,
         'remote_addr' => ip_address(),
         'is_draft' => $is_draft,

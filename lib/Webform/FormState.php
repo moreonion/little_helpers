@@ -5,15 +5,27 @@
 
 namespace Drupal\little_helpers\Webform;
 
+/**
+ * @deprecated
+ *   This class is deprecated in favor of Webform::fromFormState().
+ */
 class FormState {
   protected $node;
   protected $formState;
   public $webform;
 
-  public function __construct($node, array &$form_state) {
+  public function __construct($node, $form, array &$form_state) {
     $this->node = $node;
     $this->webform = new Webform($node);
-    $this->formState = &$form_state;
+    // Check if webform_client_form_pages() has already been run.
+    // Run it on a copy of the form state if not.
+    if (!isset($form_state['values']['submitted_tree'])) {
+      $this->formState = $form_state;
+      webform_client_form_pages($form, $this->formState);
+    }
+    else {
+      $this->formState = &$form_state;
+    }
   }
 
   public function getNode() {
@@ -23,11 +35,12 @@ class FormState {
   protected function formStateValue(&$component) {
     $form_key = $component['form_key'];
     $cid = $component['cid'];
-    if (isset($this->formState['values'][$form_key])) {
-      return $this->formState['values'][$form_key];
-    }
-    elseif (isset($this->formState['values']['submitted'][$cid]) == TRUE) {
+    // Normally this just works.
+    if (isset($this->formState['values']['submitted'][$cid]) == TRUE) {
       return $this->formState['values']['submitted'][$cid];
+    }
+    elseif (isset($this->formState['values'][$form_key])) {
+      return $this->formState['values'][$form_key];
     }
     elseif (isset($this->formState['values']['submitted'][$form_key]) == TRUE) {
       return $this->formState['values']['submitted'][$form_key];
