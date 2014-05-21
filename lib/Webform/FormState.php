@@ -12,19 +12,22 @@ namespace Drupal\little_helpers\Webform;
 class FormState {
   protected $node;
   protected $formState;
+  protected $values;
   public $webform;
 
   public function __construct($node, $form, array &$form_state) {
     $this->node = $node;
     $this->webform = new Webform($node);
+    $this->formState = &$form_state;
     // Check if webform_client_form_pages() has already been run.
     // Run it on a copy of the form state if not.
     if (!isset($form_state['values']['submitted_tree'])) {
-      $this->formState = $form_state;
-      webform_client_form_pages($form, $this->formState);
+      $fs = $form_state;
+      webform_client_form_pages($form, $fs);
+      $this->values = $fs['values']['submitted'];
     }
     else {
-      $this->formState = &$form_state;
+      $this->values = &$form_state['values']['submitted'];
     }
   }
 
@@ -36,17 +39,8 @@ class FormState {
     $form_key = $component['form_key'];
     $cid = $component['cid'];
     // Normally this just works.
-    if (isset($this->formState['values']['submitted'][$cid]) == TRUE) {
-      return $this->formState['values']['submitted'][$cid];
-    }
-    elseif (isset($this->formState['values'][$form_key])) {
-      return $this->formState['values'][$form_key];
-    }
-    elseif (isset($this->formState['values']['submitted'][$form_key]) == TRUE) {
-      return $this->formState['values']['submitted'][$form_key];
-    }
-    elseif (isset($this->formState['storage']['submitted'][$cid]) == TRUE) {
-      return $this->formState['storage']['submitted'][$cid];
+    if (isset($this->values[$cid]) == TRUE) {
+      return $this->values[$cid];
     }
     else {
       return NULL;
@@ -68,8 +62,8 @@ class FormState {
   public function valuesByKeys(array $keys) {
     $result = array();
     foreach ($keys as $key) {
-      if (($result = $this->valueByKey($key))) {
-        $result[$key] = $result;
+      if (($res = $this->valueByKey($key))) {
+        $result[$key] = $res;
       }
     }
     return $result;
@@ -93,5 +87,9 @@ class FormState {
     if (isset($this->formState['values']['details']['sid'])) {
       return Submission::load($this->node->nid, $this->formState['values']['details']['sid']);
     }
+  }
+
+  public function __sleep() {
+    throw new Exception('FormState objects cannot be serialized as they would lose their reference to the form_state.');
   }
 }

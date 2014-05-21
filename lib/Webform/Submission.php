@@ -18,48 +18,16 @@ class Submission {
     return new static($node, $submission);
   }
 
-  /**
-   * Construct a submission object from a form_state like
-   * @see webform_client_form_submit() does.
-   */
-  public static function fromFormState($node, $form, &$form_state) {
-    $fs = $form_state;
-    if (!isset($fs['values']['submitted_tree'])) {
-      webform_client_form_pages($form, $fs);
-    }
-    $is_draft = (int) !empty($fs['save_draft']);
-    $sid = $fs['values']['details']['sid'] ? (int) $fs['values']['details']['sid'] : NULL;
-    $data = webform_submission_data($node, $fs['values']['submitted']);
-
-    if (!$sid) {
-      $submission = new static($node, (object) array(
-        'nid' => $node->nid,
-        'uid' => $fs['values']['details']['uid'],
-        'submitted' => REQUEST_TIME,
-        'remote_addr' => ip_address(),
-        'is_draft' => $is_draft,
-        'data' => $data,
-      ));
-    }
-    else {
-      $submission = static::load($node->webform['nid'], $sid);
-      $submission->is_draft = $is_draft;
-      $submission->data = $data + $submission->data;
-    }
-    return $submission;
-  }
-
   public function __construct($node, $submission) {
-    $this->submission = $submission;
-    $this->node    = $node;
-    $this->webform = new Webform($node);
-
-    $this->submitted = $submission->submitted;
+    $this->submission  = $submission;
+    $this->node        = $node;
+    $this->webform     = new Webform($node);
+    $this->submitted   = $submission->submitted;
     $this->remote_addr = $submission->remote_addr;
 
     if (!isset($submission->tracking)) {
-      $submission->tracking = array();
-      if (module_exists('webform_tracking')) {
+      $submission->tracking = (object) array();
+      if (module_exists('webform_tracking') && isset($submission->sid)) {
         webform_tracking_load($submission);
       }
     }
