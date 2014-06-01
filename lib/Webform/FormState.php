@@ -6,8 +6,7 @@
 namespace Drupal\little_helpers\Webform;
 
 /**
- * @deprecated
- *   This class is deprecated in favor of Webform::fromFormState().
+ * Class for making webform component values before an submission is saved.
  */
 class FormState {
   protected $node;
@@ -21,7 +20,11 @@ class FormState {
     $this->formState = &$form_state;
     // Check if webform_client_form_pages() has already been run.
     // Run it on a copy of the form state if not.
-    if (!isset($form_state['values']['submitted_tree'])) {
+    if (
+      strpos($form['#form_id'], 'webform_client_form') === 0
+      && isset($form_state['values']['details']['nid'])
+      && !isset($form_state['values']['submitted_tree'])
+    ) {
       $fs = $form_state;
       webform_client_form_pages($form, $fs);
       $this->values = $fs['values']['submitted'];
