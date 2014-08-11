@@ -22,7 +22,6 @@ class FormState {
     // Run it on a copy of the form state if not.
     if (
       strpos($form['#form_id'], 'webform_client_form') === 0
-      && isset($form_state['values']['details']['nid'])
       && !isset($form_state['values']['submitted_tree'])
     ) {
       $fs = $form_state;
