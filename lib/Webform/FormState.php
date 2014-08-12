@@ -25,6 +25,11 @@ class FormState {
       && !isset($form_state['values']['submitted_tree'])
     ) {
       $fs = $form_state;
+      $fs['values']['details']['nid'] = $node->nid;
+      if (!isset($fs['values']['op'])) {
+        $fs['values']['op'] = 'next';
+        $fs['clicked_button']['#parents'][0] = 'next';
+      }
       webform_client_form_pages($form, $fs);
       $this->values = $fs['values']['submitted'];
     }
