@@ -31,6 +31,13 @@ class FormStateTest extends \DrupalWebTestCase {
     node_delete($this->webformNode->nid);
   }
 
+  protected function formStub() {
+    $form = array(
+      '#form_id' => 'webform_client_form',
+    );
+    return $form;
+  }
+
   protected function formStateFirstPageUnprocessedStub() {
     $form_state = array(
       'values' => array(
@@ -531,30 +538,30 @@ class FormStateTest extends \DrupalWebTestCase {
 
   public function testFormStateFirstPageUnprocessed_returnsValueByKey() {
     $form_state = $this->formStateFirstPageUnprocessedStub();
-    $form       = array();
+    $form       = $this->formStub();
     $formState  = new FormState($this->webformNode, $form, $form_state);
-    $this->assertEqual($formState->valueByKey('first_name'), 'Myfirstname');
+    $this->assertEqual('Myfirstname', $formState->valueByKey('first_name'));
   }
   public function testFormStateFirstPageUnprocessed_returnsValueByCid() {
     $form_state = $this->formStateFirstPageUnprocessedStub();
-    $form       = array();
+    $form       = $this->formStub();
     $formState  = new FormState($this->webformNode, $form, $form_state);
-    $this->assertEqual($formState->valueByCid(15), '01/1234568');
+    $this->assertEqual('01/1234568', $formState->valueByCid(15));
   }
   public function testFormStateFirstPageUnprocessed_returnsValueByKeys() {
     $form_state = $this->formStateFirstPageUnprocessedStub();
-    $form       = array();
+    $form       = $this->formStub();
     $formState  = new FormState($this->webformNode, $form, $form_state);
     $value_reference = array(
       'first_name'   => 'Myfirstname',
       'email'        => 'myemail@address.at',
       'phone_number' => '01/1234568',
     );
-    $this->assertEqual($formState->valuesByKeys(array_keys($value_reference)), $value_reference);
+    $this->assertEqual($value_reference, $formState->valuesByKeys(array_keys($value_reference)));
   }
   public function testFormStateFirstPageUnprocessed_returnsValueByType() {
     $form_state = $this->formStateFirstPageUnprocessedStub();
-    $form       = array();
+    $form       = $this->formStub();
     $formState  = new FormState($this->webformNode, $form, $form_state);
     $value_reference = array(
       'first_name'        => 'Myfirstname',
@@ -563,6 +570,6 @@ class FormStateTest extends \DrupalWebTestCase {
       'new_1400574602889' => NULL,
       'date_of_birth'     => NULL,
     );
-    $this->assertEqual($formState->valuesByType('textfield'), $value_reference);
+    $this->assertEqual($value_reference, $formState->valuesByType('textfield'));
   }
 }
