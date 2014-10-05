@@ -2,7 +2,7 @@
 
 namespace Drupal\little_helpers\Webform;
 
-class FormStateTest extends \DrupalWebTestCase {
+class FormStateTest extends \Drupal\Tests\DrupalWebTestCase {
   protected $webformNode = NULL;
 
   /*

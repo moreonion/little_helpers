@@ -2,7 +2,7 @@
 
 namespace Drupal\little_helpers\Webform;
 
-class WebformTest extends \DrupalUnitTestCase {
+class WebformTest extends \Drupal\Tests\DrupalUnitTestCase {
   public static function nodeStub() {
     $webform['redirect_url'] = 'node/167';
     $webform['components'][1] = array(
