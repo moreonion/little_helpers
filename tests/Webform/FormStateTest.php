@@ -64,6 +64,7 @@ class FormStateTest extends \Drupal\Tests\DrupalWebTestCase {
         ),
         'page_num' => 1,
         'page_count' => 3,
+        'preview' => FALSE,
       ),
       'clicked_button' => array(
         '#parents' => array(
@@ -523,6 +524,7 @@ class FormStateTest extends \Drupal\Tests\DrupalWebTestCase {
         'roles' => array('1', '2'),
         'components' => array(),
         'emails' => array(),
+        'preview' => FALSE,
       ),
     );
     $this->nodeStubAddWebform($settings['webform']['components']);
