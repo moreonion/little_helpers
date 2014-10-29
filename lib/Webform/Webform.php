@@ -124,7 +124,7 @@ class Webform {
     if (!module_exists('webform_confirm_email')) {
       return FALSE;
     }
-    $result = db_query('SELECT eid FROM {webform_confirm_email} WHERE email_type=1');
+    $result = db_query('SELECT eid FROM {webform_confirm_email} WHERE email_type=1 AND nid=:nid', array(':nid' => $this->node->nid));
     return (bool) $result->fetch();
   }
 
