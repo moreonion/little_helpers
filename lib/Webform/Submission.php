@@ -31,6 +31,13 @@ class Submission {
         webform_tracking_load($submission);
       }
     }
+    // Some components like checkboxes and fieldsets may have no values
+    // We want to return NULL in that case instead of throwing a notice.
+    foreach (array_keys($this->node->webform['components']) as $cid) {
+      if (!isset($this->submission->data[$cid])) {
+        $this->submission->data[$cid]['value'] = array(NULL);
+      }
+    }
   }
 
   public function getNode() {
@@ -39,7 +46,7 @@ class Submission {
 
   public function valueByKey($form_key) {
     if ($component = &$this->webform->componentByKey($form_key)) {
-      return $this->submission->data[$component['cid']]['value'][0];
+      return $this->valueByCid($component['cid']);
     }
     elseif (isset($this->submission->tracking->$form_key)) {
       return $this->submission->tracking->$form_key;
@@ -48,7 +55,7 @@ class Submission {
 
   public function valuesByKey($form_key) {
     if ($component = &$this->webform->componentByKey($form_key)) {
-      return $this->submission->data[$component['cid']]['value'];
+      return $this->valuesByCid($component['cid']);
     }
     elseif (isset($this->submission->tracking->$form_key)) {
       return $this->submission->tracking->$form_key;
@@ -58,7 +65,7 @@ class Submission {
   public function valuesByType($type) {
     $values = array();
     foreach (array_keys($this->componentsByType($type)) as $cid) {
-      $values[$cid] = $this->submission->data[$cid]['value'][0];
+      $values[$cid] = $this->valueByCid($cid);
     }
     return $values;
   }
