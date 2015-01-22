@@ -128,12 +128,23 @@ class Webform {
     return (bool) $result->fetch();
   }
 
+  /**
+   * @deprecated Serializing submission objects is not a good idea especially
+   *   for long term storage.
+   */
   public function __sleep() {
     $this->nid = $this->node->nid;
     return array('nid');
   }
 
+  /**
+   * @deprecated Serializing submission objects is not a good idea especially
+   *   for long term storage.
+   */
   public function __wakeup() {
+    if (!($node = node_load($this->nid))) {
+      throw new \UnexpectedValueException('Tried to __wakeup with non-existing node.');
+    }
     $this->__construct(\node_load($this->nid));
   }
 }

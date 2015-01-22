@@ -15,7 +15,9 @@ class Submission {
   public static function load($nid, $sid) {
     $node = node_load($nid);
     $submission = webform_get_submission($nid, $sid);
-    return new static($node, $submission);
+    if ($node && $submission) {
+      return new static($node, $submission);
+    }
   }
 
   public function __construct($node, $submission) {
@@ -82,13 +84,34 @@ class Submission {
     return $this->submission;
   }
 
+  public function ids() {
+    return array(
+      'nid' => $this->node->nid,
+      'sid' => $this->submission->sid,
+    );
+  }
+
+  /**
+   * @deprecated Serializing submission objects is not a good idea especially
+   *   for long term storage.
+   */
   public function __sleep() {
     $this->nid = $this->node->nid;
     $this->sid = $this->submission->sid;
     return array('nid', 'sid');
   }
 
+  /**
+   * @deprecated Serializing submission objects is not a good idea especially
+   *   for long term storage.
+   */
   public function __wakeup() {
-    $this->__construct(node_load($this->nid), webform_get_submission($this->nid, $this->sid));
+    if (!($node = node_load($this->nid))) {
+      throw new \UnexpectedValueException('Tried to __wakeup with non-existing node.');
+    }
+    if (!($submission = webform_get_submission($this->nid, $this->sid))) {
+      throw new \UnexpectedValueException('Tried to __wakeup with non-existing submission.');
+    }
+    $this->__construct($node, $submission);
   }
 }
