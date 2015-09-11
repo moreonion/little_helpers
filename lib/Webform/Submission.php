@@ -73,7 +73,7 @@ class Submission {
   }
 
   public function valueByCid($cid) {
-    return $this->submission->data[$cid]['value'][0];
+    return current($this->submission->data[$cid]['value']);
   }
 
   public function valuesByCid($cid) {
