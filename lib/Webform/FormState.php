@@ -18,51 +18,37 @@ class FormState {
     $this->node = $node;
     $this->webform = new Webform($node);
     $this->formState = &$form_state;
-    // Check if webform_client_form_pages() has already been run.
-    // Run it on a copy of the form state if not.
-    if (
-      strpos($form['#form_id'], 'webform_client_form') === 0
-      && !isset($form_state['values']['submitted_tree'])
-    ) {
-      $fs = $form_state;
-      $fs['values']['details']['nid'] = $node->nid;
-      if (!isset($fs['values']['op'])) {
-        $fs['values']['op'] = 'next';
-        $fs['clicked_button']['#parents'][0] = 'next';
-      }
-      webform_client_form_pages($form, $fs);
-      $this->values = $fs['values']['submitted'];
-    }
-    else {
-      $this->values = &$form_state['values']['submitted'];
-    }
+    // Assume webform_client_form_pages() has already been run.
+    $this->values = &$form_state['values']['submitted'];
   }
 
   public function getNode() {
     return $this->node;
   }
 
-  protected function formStateValue(&$component) {
-    $form_key = $component['form_key'];
-    $cid = $component['cid'];
-    // Normally this just works.
-    if (isset($this->values[$cid]) == TRUE) {
+  public function valueByCid($cid) {
+    if (isset($this->values[$cid])) {
+      if (is_array($this->values[$cid])) {
+        reset($this->values[$cid]);
+        return current($this->values[$cid]);
+      }
       return $this->values[$cid];
-    }
-    else {
-      return NULL;
     }
   }
 
-  public function valueByCid($cid) {
-    if ($component = $this->webform->component($cid)) {
-      return $this->formStateValue($component);
+  public function valuesByCid($cid) {
+    if (isset($this->values[$cid])) {
+      if (is_array($this->values[$cid])) {
+        return $this->values[$cid];
+      }
+      return array($this->values[$cid]);
     }
+    return array();
   }
 
   public function valueByKey($form_key) {
     if ($component = $this->webform->componentByKey($form_key)) {
-      return $this->formStateValue($component);
+      return $this->valueByCid($component['cid']);
     }
   }
 
@@ -77,14 +63,10 @@ class FormState {
   }
 
   public function valuesByType($type) {
-    if (empty($this->formState)) {
-      return NULL;
-    }
-
     $result = array();
     $components = $this->webform->componentsByType($type);
-    foreach ($components as &$component) {
-      $result[$component['form_key']] = $this->formStateValue($component);
+    foreach ($components as $component) {
+      $result[$component['form_key']] = $this->valueByCid($component['cid']);
     }
 
     return $result;

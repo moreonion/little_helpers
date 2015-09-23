@@ -7,6 +7,11 @@ class Webform {
   protected $webform;
   public $nid;
 
+  public static function is_webform4() {
+    // Only webform4 has token support - so this is a cheap way to check.
+    return function_exists('webform_replace_tokens');
+  }
+
   public function __construct($node) {
     $this->node = $node;
     $this->webform = &$node->webform;

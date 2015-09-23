@@ -11,6 +11,7 @@ class Submission {
 
   public $remote_addr;
   public $submitted;
+  protected $data;
 
   public static function load($nid, $sid) {
     $node = node_load($nid);
@@ -26,6 +27,7 @@ class Submission {
     $this->webform     = new Webform($node);
     $this->submitted   = $submission->submitted;
     $this->remote_addr = $submission->remote_addr;
+    $this->data = array();
 
     if (!isset($submission->tracking)) {
       $submission->tracking = (object) array();
@@ -35,9 +37,15 @@ class Submission {
     }
     // Some components like checkboxes and fieldsets may have no values
     // We want to return NULL in that case instead of throwing a notice.
+    $webform4 = Webform::is_webform4();
     foreach (array_keys($this->node->webform['components']) as $cid) {
-      if (!isset($this->submission->data[$cid])) {
-        $this->submission->data[$cid]['value'] = array(NULL);
+      if (isset($this->submission->data[$cid])) {
+        $this->data[$cid] = $webform4 ?
+                            $this->submission->data[$cid] :
+                            $this->submission->data[$cid]['value'];
+      }
+      else {
+        $this->data[$cid] = array(NULL);
       }
     }
   }
@@ -73,12 +81,12 @@ class Submission {
   }
 
   public function valueByCid($cid) {
-    reset($this->submission->data[$cid]['value']);
-    return current($this->submission->data[$cid]['value']);
+    reset($this->data[$cid]);
+    return current($this->data[$cid]);
   }
 
   public function valuesByCid($cid) {
-    return $this->submission->data[$cid]['value'];
+    return $this->data[$cid];
   }
 
   public function unwrap() {
