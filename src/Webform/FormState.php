@@ -79,6 +79,6 @@ class FormState {
   }
 
   public function __sleep() {
-    throw new Exception('FormState objects cannot be serialized as they would lose their reference to the form_state.');
+    throw new \Exception('FormState objects cannot be serialized as they would lose their reference to the form_state.');
   }
 }
