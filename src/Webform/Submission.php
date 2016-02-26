@@ -5,12 +5,10 @@ namespace Drupal\little_helpers\Webform;
 module_load_include('inc', 'webform', 'includes/webform.submissions');
 
 class Submission {
-  protected $node;
+  public $node;
   protected $submission;
   public $webform;
 
-  public $remote_addr;
-  public $submitted;
   protected $data;
 
   public static function load($nid, $sid) {
@@ -48,10 +46,6 @@ class Submission {
         $this->data[$cid] = array(NULL);
       }
     }
-  }
-
-  public function getNode() {
-    return $this->node;
   }
 
   public function valueByKey($form_key) {
@@ -98,6 +92,13 @@ class Submission {
       'nid' => $this->node->nid,
       'sid' => $this->submission->sid,
     );
+  }
+
+  /**
+   * All submission properties are accessible directly.
+   */
+  public function __get($name) {
+    return $this->submission->$name;
   }
 
   /**
