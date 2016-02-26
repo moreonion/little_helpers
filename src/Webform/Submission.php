@@ -19,12 +19,16 @@ class Submission {
     }
   }
 
-  public function __construct($node, $submission) {
+  public function __construct($node_or_webform, $submission) {
     $this->submission  = $submission;
-    $this->node        = $node;
-    $this->webform     = new Webform($node);
-    $this->submitted   = $submission->submitted;
-    $this->remote_addr = $submission->remote_addr;
+    if ($node_or_webform instanceof Webform) {
+      $this->node = $node_or_webform->node;
+      $this->webform = $node_or_webform;
+    }
+    else {
+      $this->node = $node_or_webform;
+      $this->webform = new Webform($node_or_webform);
+    }
     $this->data = array();
 
     if (!isset($submission->tracking)) {
