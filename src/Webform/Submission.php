@@ -128,4 +128,8 @@ class Submission {
     }
     $this->__construct($node, $submission);
   }
+
+  public function getNode() {
+    return $this->node;
+  }
 }

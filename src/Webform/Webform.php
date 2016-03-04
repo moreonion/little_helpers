@@ -149,6 +149,7 @@ class Webform {
       // Create a new submission object.
       $submission = (object) array(
         'nid' => $node->nid,
+        'sid' => NULL,
         'uid' => $form_state['values']['details']['uid'],
         'submitted' => REQUEST_TIME,
         'remote_addr' => ip_address(),
