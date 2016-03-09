@@ -4,6 +4,9 @@ namespace Drupal\little_helpers\Webform;
 
 module_load_include('inc', 'webform', 'includes/webform.submissions');
 
+/**
+ * A useful wrapper for webform submission objects.
+ */
 class Submission {
   public $node;
   protected $submission;
@@ -11,7 +14,22 @@ class Submission {
 
   protected $data;
 
+  /**
+   * Load a submission object based on it's $nid and $sid.
+   *
+   * @param int $nid
+   *   Node ID of the submission.
+   * @param int $sid
+   *   Submission ID.
+   *
+   * @return \Drupal\little_helpers\Webform\Submission
+   *   The submission or NULL if the no submission could be loaded.
+   */
   public static function load($nid, $sid) {
+    // Neither node_load() nor webform_get_submission() can handle invalid IDs.
+    if (!$nid || !$sid) {
+      return NULL;
+    }
     $node = node_load($nid);
     $submission = webform_get_submission($nid, $sid);
     if ($node && $submission) {
@@ -19,6 +37,14 @@ class Submission {
     }
   }
 
+  /**
+   * Constructor.
+   *
+   * @param object $node_or_webform
+   *   Either a node-object or a Webform instance.
+   * @param object $submission
+   *   A submission object as created by webform.
+   */
   public function __construct($node_or_webform, $submission) {
     $this->submission  = $submission;
     if ($node_or_webform instanceof Webform) {
@@ -52,6 +78,15 @@ class Submission {
     }
   }
 
+  /**
+   * Retrieve a single value by a component's form_key.
+   *
+   * @param string $form_key
+   *   The form_key to look for.
+   *
+   * @return mixed
+   *   A value if possible or NULL otherwise.
+   */
   public function valueByKey($form_key) {
     if ($component = &$this->webform->componentByKey($form_key)) {
       return $this->valueByCid($component['cid']);
@@ -61,6 +96,15 @@ class Submission {
     }
   }
 
+  /**
+   * Retrieve all values for a component by it's form_key.
+   *
+   * @param string $form_key
+   *   The form_key to look for.
+   *
+   * @return array
+   *   An array of values.
+   */
   public function valuesByKey($form_key) {
     if ($component = &$this->webform->componentByKey($form_key)) {
       return $this->valuesByCid($component['cid']);
@@ -87,6 +131,9 @@ class Submission {
     return $this->data[$cid];
   }
 
+  /**
+   * Get the original webform object.
+   */
   public function unwrap() {
     return $this->submission;
   }
