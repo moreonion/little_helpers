@@ -1,6 +1,7 @@
 name = Little helpers
 core = 7.x
 project = little_helpers
+php = 5.4
 
 dependencies[] = field
 dependencies[] = psr0
