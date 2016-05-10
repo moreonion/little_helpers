@@ -19,10 +19,20 @@ class Field {
   public $deleted = 0;
   public $settings = array();
 
+  /**
+   * Get a list of fields by their type.
+   */
+  public static function byType($type) {
+    $fields = [];
+    foreach (\field_read_fields(['type' => $type]) as $info) {
+      $fields[$info['field_name']] = new static($info);
+    }
+    return $fields;
+  }
+
   public static function byName($name) {
-    $class = \get_called_class();
     if ($data = \field_read_field($name)) {
-      return new $class($data);
+      return new static($data);
     }
     return FALSE;
   }
@@ -102,4 +112,5 @@ class Field {
     }
     $this->field_name = $n;
   }
+
 }
