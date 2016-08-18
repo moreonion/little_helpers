@@ -60,7 +60,7 @@ class Submission {
     if (!isset($submission->tracking)) {
       $submission->tracking = (object) array();
       if (module_exists('webform_tracking') && isset($submission->sid)) {
-        webform_tracking_load($submission);
+        webform_tracking_webform_submission_load($submission);
       }
     }
     // Some components like checkboxes and fieldsets may have no values
