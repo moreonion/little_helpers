@@ -21,17 +21,20 @@ class Submission {
    *   Node ID of the submission.
    * @param int $sid
    *   Submission ID.
+   * @param bool $reset
+   *   Whether to reset the static cache from webform_get_submission(). Pass
+   *   this if you are batch-processing submissions.
    *
    * @return \Drupal\little_helpers\Webform\Submission
    *   The submission or NULL if the no submission could be loaded.
    */
-  public static function load($nid, $sid) {
+  public static function load($nid, $sid, $reset = FALSE) {
     // Neither node_load() nor webform_get_submission() can handle invalid IDs.
     if (!$nid || !$sid) {
       return NULL;
     }
     $node = node_load($nid);
-    $submission = webform_get_submission($nid, $sid);
+    $submission = webform_get_submission($nid, $sid, $reset);
     if ($node && $submission) {
       return new static($node, $submission);
     }
