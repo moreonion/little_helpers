@@ -61,10 +61,7 @@ class Submission {
     $this->data = array();
 
     if (!isset($submission->tracking)) {
-      $submission->tracking = (object) array();
-      if (module_exists('webform_tracking') && isset($submission->sid)) {
-        webform_tracking_webform_submission_load($submission);
-      }
+      $submission->tracking = (object) [];
     }
     // Some components like checkboxes and fieldsets may have no values
     // We want to return NULL in that case instead of throwing a notice.
