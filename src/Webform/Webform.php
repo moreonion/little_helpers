@@ -92,6 +92,12 @@ class Webform {
       $options = array();
       if ($submission) {
         $options['query']['sid'] = $submission->sid;
+        // Add access token for webform4.
+        if (function_exists('webform_get_submission_access_token')) {
+          if ((int) $GLOBALS['user']->uid === 0) {
+            $options['query']['token'] = webform_get_submission_access_token($submission);
+          }
+        }
       }
       return array('node/' . $node->nid . '/done', $options);
     }
