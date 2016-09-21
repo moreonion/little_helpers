@@ -208,7 +208,7 @@ class Webform {
     }
     else {
       // Create a new submission object.
-      $submission = webform_submission_create($node, $user, $form_state);
+      $submission = webform_submission_create($node, $GLOBALS['user'], $form_state);
       // Since this is a new submission, a new sid is needed.
       $sid = NULL;
     }
