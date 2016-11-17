@@ -235,8 +235,15 @@ class Webform {
     if (!module_exists('webform_confirm_email')) {
       return FALSE;
     }
-    $result = db_query('SELECT eid FROM {webform_confirm_email} WHERE email_type=1 AND nid=:nid', array(':nid' => $this->node->nid));
-    return (bool) $result->fetch();
+    $q = db_select('webform_confirm_email', 'e');
+    $q->join('webform_emails', 'we', 'we.nid=e.nid AND we.eid=e.eid');
+    $q->fields('e', ['eid'])
+      ->condition('e.email_type', 1)
+      ->condition('we.nid', $this->node->nid);
+    if (self::is_webform4()) {
+      $q->condition('we.status', 1);
+    }
+    return (bool) $q->execute()->fetch();
   }
 
   /**
