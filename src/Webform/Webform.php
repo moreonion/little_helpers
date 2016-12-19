@@ -182,6 +182,7 @@ class Webform {
    */
   protected function w4_formStateToSubmission(&$form_state) {
     $node = $this->node;
+    $form_state += ['values' => ['submitted' => [], 'details' => ['sid' => NULL, 'uid' => $GLOBALS['user']->uid]]];
     $sid = $form_state['values']['details']['sid'] ? (int) $form_state['values']['details']['sid'] : NULL;
 
     // Check if user is submitting as a draft.
