@@ -13,7 +13,7 @@ class HttpError extends \Exception {
    * Construct the error class from a result object.
    */
   public function __construct($result) {
-    $msg = "HTTP {$result->code}: {$result->status_message}";
+    $msg = "HTTP {$result->code}: {$result->error}";
     parent::__construct($msg, $result->code);
     $this->result = $result;
   }
