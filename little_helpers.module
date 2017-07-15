@@ -41,7 +41,7 @@ function little_helpers_webform_confirm_email_email_confirmed($node_or_webform, 
 }
 
 /**
- * Delivery callback for JSON APIs.
+ * Delivery callback: JSON response.
  */
 function little_helpers_deliver_json($result) {
   switch ($result) {
