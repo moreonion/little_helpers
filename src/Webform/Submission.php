@@ -116,7 +116,7 @@ class Submission {
 
   public function valuesByType($type) {
     $values = array();
-    foreach (array_keys($this->componentsByType($type)) as $cid) {
+    foreach (array_keys($this->webform->componentsByType($type)) as $cid) {
       $values[$cid] = $this->valueByCid($cid);
     }
     return $values;
