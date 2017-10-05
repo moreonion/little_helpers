@@ -65,12 +65,9 @@ class Submission {
     }
     // Some components like checkboxes and fieldsets may have no values
     // We want to return NULL in that case instead of throwing a notice.
-    $webform4 = Webform::is_webform4();
     foreach (array_keys($this->node->webform['components']) as $cid) {
       if (isset($this->submission->data[$cid])) {
-        $this->data[$cid] = $webform4 ?
-                            $this->submission->data[$cid] :
-                            $this->submission->data[$cid]['value'];
+        $this->data[$cid] = $this->submission->data[$cid];
       }
       else {
         $this->data[$cid] = array(NULL);
