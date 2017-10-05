@@ -7,11 +7,6 @@ class Webform {
   protected $webform;
   public $nid;
 
-  public static function is_webform4() {
-    // Only webform4 has token support - so this is a cheap way to check.
-    return function_exists('webform_replace_tokens');
-  }
-
   public function __construct($node) {
     $this->node = $node;
     $this->webform = &$node->webform;
@@ -93,11 +88,8 @@ class Webform {
       $options = array();
       if ($submission) {
         $options['query']['sid'] = $submission->sid;
-        // Add access token for webform4.
-        if (function_exists('webform_get_submission_access_token')) {
-          if ((int) $GLOBALS['user']->uid === 0) {
-            $options['query']['token'] = webform_get_submission_access_token($submission);
-          }
+        if ((int) $GLOBALS['user']->uid === 0) {
+          $options['query']['token'] = webform_get_submission_access_token($submission);
         }
       }
       return array('node/' . $node->nid . '/done', $options);
@@ -133,56 +125,6 @@ class Webform {
    * This is basically a copy & paste from webform_client_form_submit().
    */
   public function formStateToSubmission(&$form_state) {
-    if (self::is_webform4()) {
-      return $this->w4_formStateToSubmission($form_state);
-    }
-    else {
-      return $this->w3_formStateToSubmission($form_state);
-    }
-  }
-
-  /**
-   * Webform3 version of @see Webform::formStateToSubmission().
-   */
-  protected function w3_formStateToSubmission(&$form_state) {
-    $node = $this->node;
-    $form_state += ['values' => ['submitted' => [], 'details' => ['sid' => NULL, 'uid' => $GLOBALS['user']->uid]]];
-    $sid = $form_state['values']['details']['sid'] ? (int) $form_state['values']['details']['sid'] : NULL;
-
-    // Check if user is submitting as a draft.
-    $is_draft = (int) !empty($form_state['save_draft']);
-    $form_state += ['values' => ['submitted' => []]];
-
-    if (!$sid) {
-      // Create a new submission object.
-      $submission = (object) array(
-        'nid' => $node->nid,
-        'sid' => NULL,
-        'uid' => $form_state['values']['details']['uid'],
-        'submitted' => REQUEST_TIME,
-        'remote_addr' => ip_address(),
-        'is_draft' => $is_draft,
-        'data' => webform_submission_data($node, $form_state['values']['submitted']),
-      );
-    }
-    else {
-      // To maintain time and user information, load the existing submission.
-      $submission = webform_get_submission($node->webform['nid'], $sid);
-      $submission->is_draft = $is_draft;
-
-      // Merge with new submission data. The + operator maintains numeric keys.
-      // This maintains existing data with just-submitted data when a user resumes
-      // a submission previously saved as a draft.
-      $new_data = webform_submission_data($node, $form_state['values']['submitted']);
-      $submission->data = $new_data + $submission->data;
-    }
-    return new Submission($this, $submission);
-  }
-
-  /**
-   * Webform4 version of @see Webform::formStateToSubmission().
-   */
-  protected function w4_formStateToSubmission(&$form_state) {
     $node = $this->node;
     $form_state += ['values' => ['submitted' => [], 'details' => ['sid' => NULL, 'uid' => $GLOBALS['user']->uid]]];
     $sid = $form_state['values']['details']['sid'] ? (int) $form_state['values']['details']['sid'] : NULL;
@@ -242,10 +184,8 @@ class Webform {
     $q->join('webform_emails', 'we', 'we.nid=e.nid AND we.eid=e.eid');
     $q->fields('e', ['eid'])
       ->condition('e.email_type', 1)
-      ->condition('we.nid', $this->node->nid);
-    if (self::is_webform4()) {
-      $q->condition('we.status', 1);
-    }
+      ->condition('we.nid', $this->node->nid)
+      ->condition('we.status', 1);
     return (bool) $q->execute()->fetch();
   }
 
