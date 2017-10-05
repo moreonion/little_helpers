@@ -11,8 +11,7 @@ class PermissionMatrix {
   protected $db;
 
   public static function create($roles, $permissions) {
-    $class = get_called_class();
-    return new $class(\Database::getConnection(), $roles, $permissions);
+    return new static(\Database::getConnection(), $roles, $permissions);
   }
 
   public static function createFromSystem() {
