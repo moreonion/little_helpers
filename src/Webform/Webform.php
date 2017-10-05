@@ -193,18 +193,12 @@ class Webform {
     // exist, but webform_get_submission() will not find the draft. So, make a new
     // submission.
     if ($sid && $submission = webform_get_submission($node->webform['nid'], $sid)) {
-      // Store original data on object for use in update hook.
-      $submission->original = clone $submission;
+      // Use a clone as to not edit the values stored in the static cache.
+      $submission = clone $submission;
 
       // Merge with new submission data. The + operator maintains numeric keys.
       // This maintains existing data with just-submitted data when a user resumes
       // a submission previously saved as a draft.
-      // Remove any existing data on this and previous pages. If components are hidden, they may
-      // be in the $submission->data but absent entirely from $new_data;
-      $page_map = webform_get_conditional_sorter($node)->getPageMap();
-      for ($page_nr = 1; $page_nr <= $form_state['webform']['page_num']; $page_nr++) {
-        $submission->data = array_diff_key($submission->data, $page_map[$page_nr]);
-      }
       $submission->data = webform_submission_data($node, $form_state['values']['submitted']) + $submission->data;
     }
     else {
