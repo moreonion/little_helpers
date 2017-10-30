@@ -32,7 +32,8 @@ class Webform {
    *
    * @param string $form_key
    *   form_key of the component.
-   * @return &array
+   *
+   * @return array
    *   The component array (as in {webform_component}).
    */
   public function &componentByKey($form_key) {
@@ -120,7 +121,8 @@ class Webform {
     if (is_array($redirect)) {
       $redirect[1]['absolute'] = $absolute;
       return url($redirect[0], $redirect[1]);
-    } else {
+    }
+    else {
       return $redirect;
     }
   }
@@ -200,7 +202,7 @@ class Webform {
       // This maintains existing data with just-submitted data when a user resumes
       // a submission previously saved as a draft.
       // Remove any existing data on this and previous pages. If components are hidden, they may
-      // be in the $submission->data but absent entirely from $new_data;
+      // be in the $submission->data but absent entirely from $new_data.
       $page_map = webform_get_conditional_sorter($node)->getPageMap();
       for ($page_nr = 1; $page_nr <= $form_state['webform']['page_num']; $page_nr++) {
         $submission->data = array_diff_key($submission->data, $page_map[$page_nr]);
@@ -266,4 +268,5 @@ class Webform {
     }
     $this->__construct(\node_load($this->nid));
   }
+
 }
