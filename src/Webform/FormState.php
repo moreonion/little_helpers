@@ -1,7 +1,4 @@
 <?php
-/**
- * @file
- */
 
 namespace Drupal\little_helpers\Webform;
 

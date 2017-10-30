@@ -49,7 +49,7 @@ class Submission {
    *   A submission object as created by webform.
    */
   public function __construct($node_or_webform, $submission) {
-    $this->submission  = $submission;
+    $this->submission = $submission;
     if ($node_or_webform instanceof Webform) {
       $this->node = $node_or_webform->node;
       $this->webform = $node_or_webform;
@@ -179,4 +179,5 @@ class Submission {
   public function getNode() {
     return $this->node;
   }
+
 }
