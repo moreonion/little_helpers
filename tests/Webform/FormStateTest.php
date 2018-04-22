@@ -1,16 +1,19 @@
 <?php
 
-use Drupal\Tests\DrupalWebTestCase;
+namespace Drupal\little_helpers\Test\Webform;
 
-namespace Drupal\little_helpers\Webform;
+use Drupal\little_helpers\Webform\Webform;
 
-class FormStateTest extends DrupalWebTestCase {
+/**
+ * Test creating a submission object from various form states.
+ */
+class FormStateTest extends \DrupalWebTestCase {
   protected $webformNode = NULL;
 
   public static function getInfo() {
     return array(
-      'name'        => t('FormState class'),
-      'description' => t('Checks several methods of the little_helpers\FormState class with different $form_state setups.'),
+      'name'        => t('Create a submission from a form_state.'),
+      'description' => t('Test creating a Submission instance from several $form_state setups.'),
       'group'       => t('little_helpers'),
     );
   }
@@ -20,6 +23,7 @@ class FormStateTest extends DrupalWebTestCase {
     // module names.
     parent::setUp(array('little_helpers'));
     $this->nodeStub();
+    module_load_include('submissions.inc', 'webform', 'includes/webform');
   }
 
   /**
@@ -34,45 +38,6 @@ class FormStateTest extends DrupalWebTestCase {
       '#form_id' => 'webform_client_form',
     );
     return $form;
-  }
-
-  protected function formStateFirstPageUnprocessedStub() {
-    $form_state = array(
-      'values' => array(
-        'submitted' => array(
-          'first_test_fieldset' => array(
-            'first_name' => 'Myfirstname',
-            'email' => 'myemail@address.at',
-          ),
-          'phone_number' => '01/1234568',
-        ),
-        'details' => array(
-          'nid' => $this->webformNode->nid,
-          'sid' => NULL,
-          'uid' => '1',
-          'page_num' => 1,
-          'page_count' => 3,
-          'finished' => 0,
-        ),
-        'op' => 'Next',
-      ),
-      'webform' => array(
-        'component_tree' => array(
-          'children' => array(),
-        ),
-        'page_num' => 1,
-        'page_count' => 3,
-        'preview' => FALSE,
-      ),
-      'clicked_button' => array(
-        '#parents' => array(
-          0 => 'next',
-        ),
-      ),
-    );
-    $this->nodeStubAddWebform($form_state['webform']['component_tree']['children']);
-
-    return $form_state;
   }
 
   protected function formStateFirstPageProcessedStub() {
@@ -543,47 +508,39 @@ class FormStateTest extends DrupalWebTestCase {
    * Tests of FormState class with a form_state on the first page
    * of a multi page webform before the webform module processed it.
    */
-  public function testFormStateFirstPageUnprocessed_returnsValueByKey() {
-    $form_state = $this->formStateFirstPageUnprocessedStub();
+  public function testFormStateFirstPageProcessedReturnsValueByKey() {
+    $form_state = $this->formStateFirstPageProcessedStub();
     $form       = $this->formStub();
-    $formState  = new FormState($this->webformNode, $form, $form_state);
-    $this->assertEqual('Myfirstname', $formState->valueByKey('first_name'));
+    $webform    = new Webform($this->webformNode);
+    $submission = $webform->formStateToSubmission($form_state);
+    $this->assertEqual('Myfirstname', $submission->valueByKey('first_name'));
   }
 
   public function testFormStateFirstPageUnprocessed_returnsValueByCid() {
-    $form_state = $this->formStateFirstPageUnprocessedStub();
+    $form_state = $this->formStateFirstPageProcessedStub();
     $form       = $this->formStub();
-    $formState  = new FormState($this->webformNode, $form, $form_state);
-    $this->assertEqual('01/1234568', $formState->valueByCid(15));
-  }
-
-  public function testFormStateFirstPageUnprocessed_returnsValueByKeys() {
-    $form_state      = $this->formStateFirstPageUnprocessedStub();
-    $form            = $this->formStub();
-    $formState       = new FormState($this->webformNode, $form, $form_state);
-    $value_reference = array(
-      'first_name'   => 'Myfirstname',
-      'email'        => 'myemail@address.at',
-      'phone_number' => '01/1234568',
-    );
-    $this->assertEqual($value_reference, $formState->valuesByKeys(array_keys($value_reference)));
+    $webform    = new Webform($this->webformNode);
+    $submission = $webform->formStateToSubmission($form_state);
+    $this->assertEqual('01/1234568', $submission->valueByCid(15));
   }
 
   /**
    *
    */
   public function testFormStateFirstPageUnprocessed_returnsValueByType() {
-    $form_state      = $this->formStateFirstPageUnprocessedStub();
-    $form            = $this->formStub();
-    $formState       = new FormState($this->webformNode, $form, $form_state);
+    $form_state = $this->formStateFirstPageProcessedStub();
+    $form       = $this->formStub();
+    $webform    = new Webform($this->webformNode);
+    $submission = $webform->formStateToSubmission($form_state);
+
     $value_reference = array(
-      'first_name'        => 'Myfirstname',
-      'phone_number'      => '01/1234568',
-      'last_name'         => NULL,
-      'new_1400574602889' => NULL,
-      'date_of_birth'     => NULL,
+      1 => 'Myfirstname',
+      15 => '01/1234568',
+      14 => NULL,
+      13 => NULL,
+      19 => NULL,
     );
-    $this->assertEqual($value_reference, $formState->valuesByType('textfield'));
+    $this->assertEqual($value_reference, $submission->valuesByType('textfield'));
   }
 
 }
