@@ -2,6 +2,8 @@
 
 namespace Drupal\little_helpers\Webform;
 
+use Drupal\little_helpers\System\FormRedirect;
+
 class Webform {
   public $node;
   protected $webform;
@@ -67,8 +69,14 @@ class Webform {
    *
    * This is mainly a c&p of the relevant parts of
    * @see webform_client_form_submit().
+   *
+   * @param \Drupal\little_helpers\Webform\Submission $submission
+   *   An optional submission object used to replace tokens in the redirect URL.
+   *
+   * @return \Drupal\little_helpers\System\FormRedirect
+   *   The form redirect calculated from the webform config and submission.
    */
-  public function getRedirect($submission = NULL) {
+  public function getRedirect(Submission $submission = NULL) {
     $node = $this->node;
     $redirect_url = $node->webform['redirect_url'];
 
@@ -82,7 +90,7 @@ class Webform {
     $redirect_url = preg_replace('/^' . preg_quote($GLOBALS['base_url'], '/') . '\//', '', $redirect_url);
 
     if ($redirect_url == '<none>') {
-      return NULL;
+      return new FormRedirect(['path' => NULL]);
     }
     elseif ($redirect_url == '<confirmation>') {
       $options = array();
@@ -92,20 +100,19 @@ class Webform {
           $options['query']['token'] = webform_get_submission_access_token($submission);
         }
       }
-      return array('node/' . $node->nid . '/done', $options);
+      return new FormRedirect(['path' => "node/{$node->nid}/done"] + $options);
     }
     elseif (valid_url($redirect_url, TRUE)) {
-      return $redirect_url;
+      return FormRedirect::fromFormStateRedirect($redirect_url);
     }
     elseif ($redirect_url && strpos($redirect_url, 'http') !== 0) {
       $parts = drupal_parse_url($redirect_url);
       if ($submission) {
         $parts['query']['sid'] = $submission->sid;
       }
-      $query = $parts['query'];
-      return array($parts['path'], array('query' => $query, 'fragment' => $parts['fragment']));
+      return new FormRedirect($parts);
     }
-    return $redirect_url;
+    return FormRedirect::fromFormStateRedirect($redirect_url);
   }
 
   /**
