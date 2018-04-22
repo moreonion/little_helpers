@@ -10,6 +10,12 @@ use Drupal\little_helpers\Webform\Webform;
 class FormStateTest extends \DrupalWebTestCase {
   protected $webformNode = NULL;
 
+  /**
+   * Return test metadata for simpletest.
+   *
+   * @return string[]
+   *   Test metadata.
+   */
   public static function getInfo() {
     return array(
       'name'        => t('Create a submission from a form_state.'),
@@ -18,6 +24,9 @@ class FormStateTest extends \DrupalWebTestCase {
     );
   }
 
+  /**
+   * Enable dependencies, load includes and create a node stub.
+   */
   public function setUp() {
     // Enable any modules required for the test. This should be an array of
     // module names.
@@ -27,19 +36,15 @@ class FormStateTest extends \DrupalWebTestCase {
   }
 
   /**
-   * Implemenation of tearDown().
+   * Remove the node stub.
    */
   public function tearDown() {
     node_delete($this->webformNode->nid);
   }
 
-  protected function formStub() {
-    $form = array(
-      '#form_id' => 'webform_client_form',
-    );
-    return $form;
-  }
-
+  /**
+   * Get a form_state stub that was observed after submitting the first step.
+   */
   protected function formStateFirstPageProcessedStub() {
     $form_state = array(
       'values' => array(
@@ -76,46 +81,9 @@ class FormStateTest extends \DrupalWebTestCase {
     return $form_state;
   }
 
-  protected function formStateSecondPageUnprocessedStub() {
-    $form_state = array(
-      'values' => array(
-        'submitted' => array(
-          'new_1400574048840' => 'Page break',
-          'second_test_fieldset' => array(
-            'third_test_fieldset' => array(
-              'new_1400576593706' => '987654321',
-            ),
-            'last_name' => 'Mylastname',
-          ),
-          'new_1400574602889' => 'some text for the textfield',
-        ),
-        'details' => array(
-          'nid' => $this->webformNode->nid,
-          'sid' => NULL,
-          'uid' => '1',
-          'page_num' => 2,
-          'page_count' => 3,
-          'finished' => 0,
-        ),
-        'op' => 'Next',
-      ),
-      'webform' => array(
-        'component_tree' => array(
-          'children' => array(),
-        ),
-        'page_num' => 1,
-        'page_count' => 3,
-      ),
-      'clicked_button' => array(
-        '#parents' => array(
-          0 => 'next',
-        ),
-      ),
-    );
-
-    return $form_state;
-  }
-
+  /**
+   * Get a form_state stub that was observed after submitting the second step.
+   */
   protected function formStateSecondPageProcessedStub() {
     $form_state = array(
       'values' => array(
@@ -155,8 +123,42 @@ class FormStateTest extends \DrupalWebTestCase {
     return $form_state;
   }
 
-  protected function nodeStubAddWebform(array &$settings) {
+  /**
+   * Create a webform stub node.
+   */
+  protected function nodeStub() {
     $settings = array(
+      'type' => 'webform',
+      'language'  => LANGUAGE_NONE,
+      'uid' => '1',
+      'status' => '1',
+      'promote' => '1',
+      'moderate' => '0',
+      'sticky' => '0',
+      'tnid' => '0',
+      'translate' => '0',
+      'title' => 'FormState class unit test',
+      'body' => array(LANGUAGE_NONE => array(array('value' => 'Donec placerat. Nullam nibh dolor, blandit sed, fermentum id, imperdiet sit amet, neque. Nam mollis ultrices justo. Sed tempor. Sed vitae tellus. Etiam sem arcu, eleifend sit amet, gravida eget, porta at, wisi. Nam non lacus vitae ipsum viverra pretium. Phasellus massa. Fusce magna sem, gravida in, feugiat ac, molestie eget, wisi. Fusce consectetuer luctus ipsum. Vestibulum nunc. Suspendisse dignissim adipiscing libero. Integer leo. Sed pharetra ligula a dui. Quisque ipsum nibh, ullamcorper eget, pulvinar sed, posuere vitae, nulla. Sed varius nibh ut lacus. Curabitur fringilla. Nunc est ipsum, pretium quis, dapibus sed, varius non, lectus. Proin a quam. Praesent lacinia, eros quis aliquam porttitor, urna lacus volutpat urna, ut fermentum neque mi egestas dolor.'))),
+      'teaser' => array(LANGUAGE_NONE => array(array('value' => 'Donec placerat. Nullam nibh dolor, blandit sed, fermentum id, imperdiet sit amet, neque. Nam mollis ultrices justo. Sed tempor. Sed vitae tellus. Etiam sem arcu, eleifend sit amet, gravida eget, porta at, wisi. Nam non lacus vitae ipsum viverra pretium. Phasellus massa. Fusce magna sem, gravida in, feugiat ac, molestie eget, wisi. Fusce consectetuer luctus ipsum. Vestibulum nunc. Suspendisse dignissim adipiscing libero. Integer leo. Sed pharetra ligula a dui. Quisque ipsum nibh, ullamcorper eget, pulvinar sed, posuere vitae, nulla. Sed varius nibh ut lacus. Curabitur fringilla.'))),
+      'log' => '',
+      'format' => '1',
+      'webform' => array(
+        'confirmation' => 'Thanks!',
+        'confirmation_format' => filter_default_format(),
+        'redirect_url' => '<confirmation>',
+        'teaser' => '0',
+        'allow_draft' => '1',
+        'submit_text' => '',
+        'submit_limit' => '-1',
+        'submit_interval' => '-1',
+        'submit_notice' => '1',
+        'roles' => array('1', '2'),
+        'components' => array(),
+        'emails' => array(),
+        'preview' => FALSE,
+      ),
+    );
+    $settings['webform']['components'] = array(
       6 => array(
         'cid' => '6',
         'pid' => '0',
@@ -460,79 +462,21 @@ class FormStateTest extends \DrupalWebTestCase {
         'page_num' => 3,
       ),
     );
-  }
-
-  /**
-   *
-   */
-  protected function nodeStub() {
-    $settings = array(
-      'type' => 'webform',
-      'language'  => LANGUAGE_NONE,
-      'uid' => '1',
-      'status' => '1',
-      'promote' => '1',
-      'moderate' => '0',
-      'sticky' => '0',
-      'tnid' => '0',
-      'translate' => '0',
-      'title' => 'FormState class unit test',
-      'body' => array(LANGUAGE_NONE => array(array('value' => 'Donec placerat. Nullam nibh dolor, blandit sed, fermentum id, imperdiet sit amet, neque. Nam mollis ultrices justo. Sed tempor. Sed vitae tellus. Etiam sem arcu, eleifend sit amet, gravida eget, porta at, wisi. Nam non lacus vitae ipsum viverra pretium. Phasellus massa. Fusce magna sem, gravida in, feugiat ac, molestie eget, wisi. Fusce consectetuer luctus ipsum. Vestibulum nunc. Suspendisse dignissim adipiscing libero. Integer leo. Sed pharetra ligula a dui. Quisque ipsum nibh, ullamcorper eget, pulvinar sed, posuere vitae, nulla. Sed varius nibh ut lacus. Curabitur fringilla. Nunc est ipsum, pretium quis, dapibus sed, varius non, lectus. Proin a quam. Praesent lacinia, eros quis aliquam porttitor, urna lacus volutpat urna, ut fermentum neque mi egestas dolor.'))),
-      'teaser' => array(LANGUAGE_NONE => array(array('value' => 'Donec placerat. Nullam nibh dolor, blandit sed, fermentum id, imperdiet sit amet, neque. Nam mollis ultrices justo. Sed tempor. Sed vitae tellus. Etiam sem arcu, eleifend sit amet, gravida eget, porta at, wisi. Nam non lacus vitae ipsum viverra pretium. Phasellus massa. Fusce magna sem, gravida in, feugiat ac, molestie eget, wisi. Fusce consectetuer luctus ipsum. Vestibulum nunc. Suspendisse dignissim adipiscing libero. Integer leo. Sed pharetra ligula a dui. Quisque ipsum nibh, ullamcorper eget, pulvinar sed, posuere vitae, nulla. Sed varius nibh ut lacus. Curabitur fringilla.'))),
-      'log' => '',
-      'format' => '1',
-      'webform' => array(
-        'confirmation' => 'Thanks!',
-        'confirmation_format' => filter_default_format(),
-        'redirect_url' => '<confirmation>',
-        'teaser' => '0',
-        'allow_draft' => '1',
-        'submit_text' => '',
-        'submit_limit' => '-1',
-        'submit_interval' => '-1',
-        'submit_notice' => '1',
-        'roles' => array('1', '2'),
-        'components' => array(),
-        'emails' => array(),
-        'preview' => FALSE,
-      ),
-    );
-    $this->nodeStubAddWebform($settings['webform']['components']);
-
     $this->webformNode = $this->drupalCreateNode($settings);
   }
 
   /* ------------------------------ Tests ------------------------- */
 
   /**
-   * Tests of FormState class with a form_state on the first page
-   * of a multi page webform before the webform module processed it.
+   * Test reading values after the first step was submitted.
    */
-  public function testFormStateFirstPageProcessedReturnsValueByKey() {
+  public function testFormStateFirstPageProcessed() {
     $form_state = $this->formStateFirstPageProcessedStub();
     $form       = $this->formStub();
     $webform    = new Webform($this->webformNode);
     $submission = $webform->formStateToSubmission($form_state);
     $this->assertEqual('Myfirstname', $submission->valueByKey('first_name'));
-  }
-
-  public function testFormStateFirstPageUnprocessed_returnsValueByCid() {
-    $form_state = $this->formStateFirstPageProcessedStub();
-    $form       = $this->formStub();
-    $webform    = new Webform($this->webformNode);
-    $submission = $webform->formStateToSubmission($form_state);
     $this->assertEqual('01/1234568', $submission->valueByCid(15));
-  }
-
-  /**
-   *
-   */
-  public function testFormStateFirstPageUnprocessed_returnsValueByType() {
-    $form_state = $this->formStateFirstPageProcessedStub();
-    $form       = $this->formStub();
-    $webform    = new Webform($this->webformNode);
-    $submission = $webform->formStateToSubmission($form_state);
-
     $value_reference = array(
       1 => 'Myfirstname',
       15 => '01/1234568',
