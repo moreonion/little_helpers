@@ -1,11 +1,17 @@
 <?php
 
-use Drupal\Tests\DrupalUnitTestCase;
+namespace Drupal\little_helpers\Test\Webform;
 
-namespace Drupal\little_helpers\Webform;
+use Drupal\little_helpers\Webform\Webform;
 
+/**
+ * Test the webform node wrapper.
+ */
 class WebformTest extends \DrupalUnitTestCase {
 
+  /**
+   * Create a node stub.
+   */
   public static function nodeStub() {
     $webform['redirect_url'] = 'node/167';
     $webform['components'][1] = array(
@@ -63,14 +69,20 @@ class WebformTest extends \DrupalUnitTestCase {
     return (object) array('webform' => $webform);
   }
 
-  public function testComponent_ReturnsComponentArray() {
+  /**
+   * Test getting components by component ID.
+   */
+  public function testComponentReturnsComponentArray() {
     $node = self::nodeStub();
     $webform = new Webform($node);
     $component = $webform->component(6);
     $this->assertEqual('email_subject', $component['form_key']);
   }
 
-  public function testComponent_ReturnsNULLForUnknownComponent() {
+  /**
+   * Test getting an unknown component.
+   */
+  public function testComponentReturnsNullForUnknownComponent() {
     $node = self::nodeStub();
     $webform = new Webform($node);
     $this->assertNull($webform->component(12));
