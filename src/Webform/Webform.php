@@ -108,17 +108,6 @@ class Webform {
     return $redirect_url;
   }
 
-  public function getRedirectUrl($submission = NULL, $absolute = TRUE) {
-    $redirect = $this->getRedirect($submission);
-    if (is_array($redirect)) {
-      $redirect[1]['absolute'] = $absolute;
-      return url($redirect[0], $redirect[1]);
-    }
-    else {
-      return $redirect;
-    }
-  }
-
   /**
    * Create a submission-object from a webform_client_form $form_state.
    *
