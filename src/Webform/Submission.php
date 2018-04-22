@@ -150,29 +150,11 @@ class Submission {
   }
 
   /**
-   * @deprecated Serializing submission objects is not a good idea especially
-   *   for long term storage.
+   * Get the node of the submission.
+   *
+   * @return object
+   *   The node.
    */
-  public function __sleep() {
-    $this->nid = $this->node->nid;
-    $this->sid = $this->submission->sid;
-    return array('nid', 'sid');
-  }
-
-  /**
-   * @deprecated Serializing submission objects is not a good idea especially
-   *   for long term storage.
-   */
-  public function __wakeup() {
-    if (!($node = node_load($this->nid))) {
-      throw new \UnexpectedValueException('Tried to __wakeup with non-existing node.');
-    }
-    if (!($submission = webform_get_submission($this->nid, $this->sid))) {
-      throw new \UnexpectedValueException('Tried to __wakeup with non-existing submission.');
-    }
-    $this->__construct($node, $submission);
-  }
-
   public function getNode() {
     return $this->node;
   }
