@@ -4,7 +4,7 @@ use Drupal\Tests\DrupalUnitTestCase;
 
 namespace Drupal\little_helpers\Webform;
 
-class WebformTest extends DrupalUnitTestCase {
+class WebformTest extends \DrupalUnitTestCase {
 
   public static function nodeStub() {
     $webform['redirect_url'] = 'node/167';
