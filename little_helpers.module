@@ -1,7 +1,50 @@
 <?php
 
-use \Drupal\little_helpers\Webform\Webform;
-use \Drupal\little_helpers\Webform\Submission;
+/**
+ * @file
+ * Hook implementations and supplementary functions availably in any request.
+ */
+
+use Drupal\little_helpers\System\FormRedirect;
+use Drupal\little_helpers\Webform\Webform;
+use Drupal\little_helpers\Webform\Submission;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for webform_client_form().
+ *
+ * Insert a custom submit handler that lets other modules alter the redirect.
+ */
+function little_helpers_form_webform_client_form_alter(array &$form, array &$form_state) {
+  $form['#submit'][] = '_little_helpers_webform_redirect_alter';
+}
+
+/**
+ * Form submission handler: Let other modules alter the redirect.
+ *
+ * @see little_helpers_form_webform_client_form_alter()
+ * @see hook_webform_redirect_alter()
+ */
+function _little_helpers_webform_redirect_alter(array $form, array &$form_state) {
+  if (!$form_state['webform_completed'] || !$form_state['redirect']) {
+    return;
+  }
+
+  $sid = $form_state['values']['details']['sid'];
+  $submission = Submission::load($form['#node']->nid, $sid);
+  $redirect = FormRedirect::fromFormStateRedirect($form_state['redirect']);
+  drupal_alter('webform_redirect', $redirect, $submission);
+  $form_state['redirect'] = $redirect->toFormStateRedirect();
+}
+
+/**
+ * Implements hook_webform_confirm_email_confirmation_redirect_alter().
+ */
+function little_helpers_webform_confirm_email_confirmation_redirect_alter(&$redirect, $node, $submission) {
+  $submission = new Submission($node, $submission);
+  $r = FormRedirect::fromFormStateRedirect($redirect);
+  drupal_alter('webform_redirect', $r, $submission);
+  $redirect = $r->toFormStateRedirect();
+}
 
 /**
  * Implements hook_webform_submission_insert().

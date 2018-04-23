@@ -1,5 +1,8 @@
 <?php
 
+use Drupal\little_helpers\System\FormRedirect;
+use Drupal\little_helpers\Webform\Submission;
+
 /**
  * React when a webform submission is completed and email confirmation is done.
  *
@@ -8,9 +11,21 @@
  *   its first time.
  * - A submission needing email confirmation is confirmed.
  *
- * @param \Drupal\little_helpers\Webform\Submission $submission_o
+ * @param \Drupal\little_helpers\Webform\Submission $submission
  *  The submission just having been confirmed / saved.
  */
 
-function hook_webform_submission_confirmed($submission_o) {
+function hook_webform_submission_confirmed(Submission $submission) {
+}
+
+/**
+ * Alter the URL the user is redirected to after submitting a webform.
+ *
+ * @param \Drupal\little_helpers\System\FormRedirect $redirect
+ *   The redirect to be altered.
+ * @param \Drupal\little_helpers\Webform\Submission $submission
+ *   The submission that is about to be finished.
+ */
+function hook_webform_redirect_alter(FormRedirect &$redirect, Submission $submission = NULL) {
+  $redirect->query['utm_source'] = 'my-tracking-parameter';
 }

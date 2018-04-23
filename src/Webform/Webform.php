@@ -90,7 +90,7 @@ class Webform {
     $redirect_url = preg_replace('/^' . preg_quote($GLOBALS['base_url'], '/') . '\//', '', $redirect_url);
 
     if ($redirect_url == '<none>') {
-      return new FormRedirect(['path' => NULL]);
+      $redirect = FormRedirect(['path' => NULL]);
     }
     elseif ($redirect_url == '<confirmation>') {
       $options = array();
@@ -100,19 +100,23 @@ class Webform {
           $options['query']['token'] = webform_get_submission_access_token($submission);
         }
       }
-      return new FormRedirect(['path' => "node/{$node->nid}/done"] + $options);
+      $redirect = FormRedirect(['path' => "node/{$node->nid}/done"] + $options);
     }
     elseif (valid_url($redirect_url, TRUE)) {
-      return FormRedirect::fromFormStateRedirect($redirect_url);
+      $redirect = FormRedirect::fromFormStateRedirect($redirect_url);
     }
     elseif ($redirect_url && strpos($redirect_url, 'http') !== 0) {
       $parts = drupal_parse_url($redirect_url);
       if ($submission) {
         $parts['query']['sid'] = $submission->sid;
       }
-      return new FormRedirect($parts);
+      $redirect = FormRedirect($parts);
     }
-    return FormRedirect::fromFormStateRedirect($redirect_url);
+    else {
+      $redirect = FormRedirect::fromFormStateRedirect($redirect_url);
+    }
+    drupal_alter('webform_redirect', $redirect, $submission);
+    return $submission;
   }
 
   /**
