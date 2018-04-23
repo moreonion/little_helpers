@@ -42,10 +42,9 @@ class Language {
    */
   public static function fromPredefined($langcode) {
     include_once DRUPAL_ROOT . '/includes/iso.inc';
-    $predefined          = _locale_get_predefined_list();
-    $predefined          = &$predefined[$langcode];
-    $class               = get_called_class();
-    $instance            = new $class(array('language' => $langcode));
+    $predefined = _locale_get_predefined_list();
+    $predefined = &$predefined[$langcode];
+    $instance = new static(array('language' => $langcode));
     $instance->name      = $predefined[0];
     $instance->native    = isset($predefined[1]) ? $predefined[1] : $predefined[0];
     $instance->direction = isset($predefined[2]) ? $predefined[2] : LANGUAGE_LTR;
@@ -66,8 +65,7 @@ class Language {
       ->execute()
       ->fetch();
     if ($row) {
-      $class = get_called_class();
-      return new $class($row);
+      return new static($row);
     }
   }
 

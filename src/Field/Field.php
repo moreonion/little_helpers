@@ -38,8 +38,7 @@ class Field {
   }
 
   public static function fromType($type, $name = NULL) {
-    $class = \get_called_class();
-    $new = new $class(array('field_name' => $name));
+    $new = new static(array('field_name' => $name));
     $new->setType($type);
     return $new;
   }

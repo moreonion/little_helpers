@@ -35,14 +35,12 @@ class Instance {
 
   public static function load($field_name, $entity_type, $bundle) {
     $data = \field_read_instance($entity_type, $field_name, $bundle);
-    $class = \get_called_class();
-    return new $class($data);
+    return new static($data);
   }
 
   public static function fromField(Field $field, BundleInterface $bundle = NULL, $data = array()) {
     $data = array('field' => $field, 'bundle' => $bundle) + $data;
-    $class = \get_called_class();
-    $instance = new $class($data);
+    $instance = new static($data);
     return $instance;
   }
   

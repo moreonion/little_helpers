@@ -65,12 +65,9 @@ class Submission {
     }
     // Some components like checkboxes and fieldsets may have no values
     // We want to return NULL in that case instead of throwing a notice.
-    $webform4 = Webform::is_webform4();
     foreach (array_keys($this->node->webform['components']) as $cid) {
       if (isset($this->submission->data[$cid])) {
-        $this->data[$cid] = $webform4 ?
-                            $this->submission->data[$cid] :
-                            $this->submission->data[$cid]['value'];
+        $this->data[$cid] = $this->submission->data[$cid];
       }
       else {
         $this->data[$cid] = array(NULL);
@@ -153,29 +150,11 @@ class Submission {
   }
 
   /**
-   * @deprecated Serializing submission objects is not a good idea especially
-   *   for long term storage.
+   * Get the node of the submission.
+   *
+   * @return object
+   *   The node.
    */
-  public function __sleep() {
-    $this->nid = $this->node->nid;
-    $this->sid = $this->submission->sid;
-    return array('nid', 'sid');
-  }
-
-  /**
-   * @deprecated Serializing submission objects is not a good idea especially
-   *   for long term storage.
-   */
-  public function __wakeup() {
-    if (!($node = node_load($this->nid))) {
-      throw new \UnexpectedValueException('Tried to __wakeup with non-existing node.');
-    }
-    if (!($submission = webform_get_submission($this->nid, $this->sid))) {
-      throw new \UnexpectedValueException('Tried to __wakeup with non-existing submission.');
-    }
-    $this->__construct($node, $submission);
-  }
-
   public function getNode() {
     return $this->node;
   }
