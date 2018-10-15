@@ -73,12 +73,8 @@ class Submission {
    *   A value if possible or NULL otherwise.
    */
   public function valueByKey($form_key) {
-    if ($component = &$this->webform->componentByKey($form_key)) {
-      return $this->valueByCid($component['cid']);
-    }
-    elseif (isset($this->submission->tracking->$form_key)) {
-      return $this->submission->tracking->$form_key;
-    }
+    $values = $this->valuesByKey($form_key);
+    return reset($values);
   }
 
   /**
@@ -95,7 +91,7 @@ class Submission {
       return $this->valuesByCid($component['cid']);
     }
     elseif (isset($this->submission->tracking->$form_key)) {
-      return $this->submission->tracking->$form_key;
+      return [$this->submission->tracking->$form_key];
     }
   }
 
