@@ -8,11 +8,10 @@ module_load_include('inc', 'webform', 'includes/webform.submissions');
  * A useful wrapper for webform submission objects.
  */
 class Submission {
+
   public $node;
   protected $submission;
   public $webform;
-
-  protected $data;
 
   /**
    * Load a submission object based on it's $nid and $sid.
@@ -58,20 +57,9 @@ class Submission {
       $this->node = $node_or_webform;
       $this->webform = new Webform($node_or_webform);
     }
-    $this->data = array();
 
     if (!isset($submission->tracking)) {
       $submission->tracking = (object) [];
-    }
-    // Some components like checkboxes and fieldsets may have no values
-    // We want to return NULL in that case instead of throwing a notice.
-    foreach (array_keys($this->node->webform['components']) as $cid) {
-      if (isset($this->submission->data[$cid])) {
-        $this->data[$cid] = $this->submission->data[$cid];
-      }
-      else {
-        $this->data[$cid] = array(NULL);
-      }
     }
   }
 
@@ -85,12 +73,8 @@ class Submission {
    *   A value if possible or NULL otherwise.
    */
   public function valueByKey($form_key) {
-    if ($component = &$this->webform->componentByKey($form_key)) {
-      return $this->valueByCid($component['cid']);
-    }
-    elseif (isset($this->submission->tracking->$form_key)) {
-      return $this->submission->tracking->$form_key;
-    }
+    $values = $this->valuesByKey($form_key);
+    return reset($values);
   }
 
   /**
@@ -107,10 +91,19 @@ class Submission {
       return $this->valuesByCid($component['cid']);
     }
     elseif (isset($this->submission->tracking->$form_key)) {
-      return $this->submission->tracking->$form_key;
+      return [$this->submission->tracking->$form_key];
     }
   }
 
+  /**
+   * Get values for all components of a type.
+   *
+   * @param string $type
+   *   The webform component type.
+   *
+   * @return array
+   *   Values keyed by component ID.
+   */
   public function valuesByType($type) {
     $values = array();
     foreach (array_keys($this->webform->componentsByType($type)) as $cid) {
@@ -119,13 +112,36 @@ class Submission {
     return $values;
   }
 
+  /**
+   * Get one value for a given component.
+   *
+   * @param int $cid
+   *   The component ID.
+   *
+   * @return mixed
+   *   The value of the component or NULL if there is no value.
+   */
   public function valueByCid($cid) {
-    reset($this->data[$cid]);
-    return current($this->data[$cid]);
+    if ($values = $this->valuesByCid($cid)) {
+      return reset($values);
+    }
+    return NULL;
   }
 
+  /**
+   * Get all values for a component.
+   *
+   * @param int $cid
+   *   The component ID.
+   *
+   * @return array
+   *   An array of component values.
+   */
   public function valuesByCid($cid) {
-    return $this->data[$cid];
+    if (isset($this->submission->data[$cid])) {
+      return $this->submission->data[$cid];
+    }
+    return [];
   }
 
   /**
@@ -135,6 +151,14 @@ class Submission {
     return $this->submission;
   }
 
+  /**
+   * Return the nid and sid in an array.
+   *
+   * @return int[]
+   *   Array with two keys:
+   *   - nid: The nid of the webform.
+   *   - sid: The sid of the submission.
+   */
   public function ids() {
     return array(
       'nid' => $this->node->nid,
@@ -143,7 +167,10 @@ class Submission {
   }
 
   /**
-   * All submission properties are accessible directly.
+   * Transparently access submission properties.
+   *
+   * @return mixed
+   *   The value of the submission property.
    */
   public function __get($name) {
     return $this->submission->$name;
