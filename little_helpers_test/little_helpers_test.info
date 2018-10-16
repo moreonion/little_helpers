@@ -1,0 +1,5 @@
+name = Little helpers test module
+description = This is used for testing only.
+core = 7.x
+package = Other
+hidden = TRUE

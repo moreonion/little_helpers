@@ -1,0 +1,17 @@
+<?php
+
+use Drupal\little_helpers\System\FormRedirect;
+use Drupal\little_helpers\Webform\Submission;
+
+/**
+ * Test hook implementations.
+ * @file
+ */
+
+/**
+ * Implements hook_webform_redirect_alter().
+ */
+function little_helpers_test_webform_redirect_alter(FormRedirect $redirect, Submission $submission = NULL) {
+  $redirect->query['test'] = 'foo';
+  $redirect->fragment .= 'bar';
+}

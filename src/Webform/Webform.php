@@ -73,7 +73,7 @@ class Webform {
    * @param \Drupal\little_helpers\Webform\Submission $submission
    *   An optional submission object used to replace tokens in the redirect URL.
    *
-   * @return \Drupal\little_helpers\System\FormRedirect
+   * @return array
    *   The form redirect calculated from the webform config and submission.
    */
   public function getRedirect(Submission $submission = NULL) {
@@ -90,7 +90,7 @@ class Webform {
     $redirect_url = preg_replace('/^' . preg_quote($GLOBALS['base_url'], '/') . '\//', '', $redirect_url);
 
     if ($redirect_url == '<none>') {
-      $redirect = FormRedirect(['path' => NULL]);
+      $redirect = new FormRedirect(['path' => NULL]);
     }
     elseif ($redirect_url == '<confirmation>') {
       $options = array();
@@ -100,7 +100,7 @@ class Webform {
           $options['query']['token'] = webform_get_submission_access_token($submission);
         }
       }
-      $redirect = FormRedirect(['path' => "node/{$node->nid}/done"] + $options);
+      $redirect = new FormRedirect(['path' => "node/{$node->nid}/done"] + $options);
     }
     elseif (valid_url($redirect_url, TRUE)) {
       $redirect = FormRedirect::fromFormStateRedirect($redirect_url);
@@ -110,13 +110,13 @@ class Webform {
       if ($submission) {
         $parts['query']['sid'] = $submission->sid;
       }
-      $redirect = FormRedirect($parts);
+      $redirect = new FormRedirect($parts);
     }
     else {
       $redirect = FormRedirect::fromFormStateRedirect($redirect_url);
     }
     drupal_alter('webform_redirect', $redirect, $submission);
-    return $submission;
+    return $redirect->toFormStateRedirect();
   }
 
   /**
