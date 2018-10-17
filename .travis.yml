@@ -29,7 +29,7 @@ before_script:
   - cd test-root
   - root=`pwd`
   - drush dl ctools psr0 views webform
-  - drush --yes pm-enable little_helpers webform
+  - drush --yes pm-enable little_helpers little_helpers_test webform
 
 script:
   - cd $repo
