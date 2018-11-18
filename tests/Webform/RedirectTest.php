@@ -15,6 +15,7 @@ class RedirectTest extends \DrupalUnitTestCase {
       'nid' => 1,
       'sid' => 2,
       'data' => [],
+      'submitted' => NULL,
     ];
     $node_array['nid'] = 1;
     $node_array['webform'] = [

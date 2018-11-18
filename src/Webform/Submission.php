@@ -73,8 +73,10 @@ class Submission {
    *   A value if possible or NULL otherwise.
    */
   public function valueByKey($form_key) {
-    $values = $this->valuesByKey($form_key);
-    return reset($values);
+    if ($values = $this->valuesByKey($form_key)) {
+      return reset($values);
+    }
+    return NULL;
   }
 
   /**
@@ -93,6 +95,7 @@ class Submission {
     elseif (isset($this->submission->tracking->$form_key)) {
       return [$this->submission->tracking->$form_key];
     }
+    return [];
   }
 
   /**
