@@ -39,4 +39,16 @@ class SubmissionTest extends \DrupalUnitTestCase {
     $this->assertEqual('ZZ', $submission->valueByKey('country'));
   }
 
+  /**
+   * Test get value by key from unknown component.
+   */
+  public function testGetValueByKeyUnknownComponent() {
+    $submission = (object) [
+      'data' => [],
+    ];
+    $node_array['webform'] = ['components' => []];
+    $submission = new Submission((object) $node_array, $submission);
+    $this->assertNull($submission->valueByKey('something'));
+  }
+
 }
