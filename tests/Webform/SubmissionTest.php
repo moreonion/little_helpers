@@ -51,4 +51,17 @@ class SubmissionTest extends \DrupalUnitTestCase {
     $this->assertNull($submission->valueByKey('something'));
   }
 
+  /**
+   * Test that isset() or empty() works on wrapped properties.
+   */
+  public function testCheckIsset() {
+    $submission = (object) [
+      'data' => [1 => []],
+    ];
+    $node_array['webform'] = ['components' => []];
+    $submission = new Submission((object) $node_array, $submission);
+    $this->assertTrue(isset($submission->data));
+    $this->assertTrue(!empty($submission->data));
+  }
+
 }

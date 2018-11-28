@@ -180,6 +180,16 @@ class Submission {
   }
 
   /**
+   * Transparently check for existence of properties.
+   *
+   * @return bool
+   *   TRUE if the property exists in the wrapped submission.
+   */
+  public function __isset($name) {
+    return isset($this->submission->$name);
+  }
+
+  /**
    * Get the node of the submission.
    *
    * @return object
