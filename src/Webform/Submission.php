@@ -180,6 +180,13 @@ class Submission {
   }
 
   /**
+   * Transparently access submission properties.
+   */
+  public function __set($name, $value) {
+    return $this->submission->$name = $value;
+  }
+
+  /**
    * Transparently check for existence of properties.
    *
    * @return bool
@@ -187,6 +194,13 @@ class Submission {
    */
   public function __isset($name) {
     return isset($this->submission->$name);
+  }
+
+  /**
+   * Transparently access submission properties.
+   */
+  public function __unset($name) {
+    unset($this->submission->$name);
   }
 
   /**
