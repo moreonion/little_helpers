@@ -52,9 +52,9 @@ class SubmissionTest extends \DrupalUnitTestCase {
   }
 
   /**
-   * Test that isset() or empty() works on wrapped properties.
+   * Test that accessing works on submission properties.
    */
-  public function testCheckIsset() {
+  public function testAccessingSubmissionProperties() {
     $submission = (object) [
       'data' => [1 => []],
     ];
@@ -62,6 +62,16 @@ class SubmissionTest extends \DrupalUnitTestCase {
     $submission = new Submission((object) $node_array, $submission);
     $this->assertTrue(isset($submission->data));
     $this->assertTrue(!empty($submission->data));
+    $this->assertEquals([1 => []], $submission->data);
+
+    $this->assertFalse(isset($submission->test));
+    $submission->test = 1;
+    $this->assertEquals(1, $submission->unwrap()->test);
+    $this->assertEquals(1, $submission->test);
+    $this->assertFalse(empty($submission->test));
+
+    unset($submission->test);
+    $this->assertTrue(empty($submission->test));
   }
 
 }
