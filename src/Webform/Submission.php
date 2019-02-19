@@ -213,4 +213,45 @@ class Submission {
     return $this->node;
   }
 
+  /**
+   * Insert or update this submission.
+   */
+  public function save() {
+    // These need to be done with the naked submission object otherwise
+    // drupal_write_record() will ignore all magic properties because it uses
+    // propert_exists() to check for them.
+    if (!empty($this->submission->sid)) {
+      webform_submission_update($this->node, $this->submission);
+    }
+    else {
+      webform_submission_insert($this->node, $this->submission);
+    }
+  }
+
+  /**
+   * Delete this webform submission.
+   */
+  public function delete() {
+    if (!empty($this->submission->sid)) {
+      webform_submission_delete($this->node, $this);
+    }
+  }
+
+  /**
+   * Send emails related to this submission.
+   *
+   * This function is usually invoked when a submission is completed, but may be
+   * called any time e-mails should be redelivered.
+   *
+   * @param array $emails
+   *   (optional) An array of specific e-mail settings to be used. If omitted,
+   *   all emails in $node->webform['emails'] will be sent.
+   *
+   * @return int
+   *   Number of emails sent.
+   */
+  public function sendEmails(array $emails = NULL) {
+    return webform_submission_send_mail($this->node, $this, $emails);
+  }
+
 }
