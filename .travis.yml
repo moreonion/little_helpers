@@ -1,9 +1,8 @@
 language: php
-sudo: false
-
+services:
+  - mysql
 php:
-  - 7.0
-
+  - 7.1
 mysql:
   database: drupal
   username: root
@@ -16,7 +15,7 @@ cache:
 
 install:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - composer global require drush/drush:8.1.* torotil/upal:1.1.1
+  - composer global require drush/drush:8.1.* torotil/upal:1.1.1 phpunit/phpunit:6.4.*
 
 before_script:
   - repo=`pwd`
