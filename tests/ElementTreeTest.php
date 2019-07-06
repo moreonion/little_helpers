@@ -20,15 +20,15 @@ class ElementTreeTest extends DrupalUnitTestCase {
       'b' => [],
       '#no-element' => 'test',
     ];
-    $bfs_order = [];
+    $element_keys = [];
     $count = 0;
-    ElementTree::applyRecursively($test_array, function (&$element, $key) use (&$bfs, &$count) {
+    ElementTree::applyRecursively($test_array, function (&$element, $key) use (&$element_keys, &$count) {
       if ($key) {
-        $bfs[] = $key;
+        $element_keys[] = $key;
       }
       $element['#index'] = $count++;
     });
-    $this->assertEqual(['a', 'a1', 'b'], $bfs);
+    $this->assertEqual(['a', 'a1', 'b'], $element_keys);
     $this->assertEqual([
       'a' => [
         'a1' => ['#index' => 2],
@@ -38,6 +38,34 @@ class ElementTreeTest extends DrupalUnitTestCase {
       '#no-element' => 'test',
       '#index' => 0,
     ], $test_array);
+  }
+
+  /**
+   * Test post-order traversal.
+   */
+  public function testApplyRecursivelyPostOrder() {
+    $test_array = [
+      'a' => [
+        'a1' => ['#add' => [1, 2]],
+        '#add' => [3],
+      ],
+      'b' => ['#add' => [4]],
+    ];
+    ElementTree::applyRecursively($test_array, function (&$element, $key, &$parent) {
+      $element += [
+        '#sum' => 0,
+        '#add' => [],
+      ];
+    });
+    ElementTree::applyRecursively($test_array, function (&$element, $key, &$parent) {
+      $element['#sum'] += array_sum($element['#add']);
+      if ($parent) {
+        $parent['#sum'] += $element['#sum'];
+      }
+    }, TRUE);
+    $this->assertEqual(3, $test_array['a']['a1']['#sum']);
+    $this->assertEqual(6, $test_array['a']['#sum']);
+    $this->assertEqual(10, $test_array['#sum']);
   }
 
 }

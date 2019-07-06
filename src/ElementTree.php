@@ -10,7 +10,7 @@ class ElementTree {
   /**
    * Apply a callback recursively to all elements in a form or renderable array.
    *
-   * The element tree is traversed in depth-first-search pre-order. For example:
+   * The element tree is traversed using depth-first-search. For example:
    * | root
    * | | fieldset1
    * | | | textfield1
@@ -27,16 +27,36 @@ class ElementTree {
    *   - &$element: The reference to the element.
    *   - $key: The element’s key in the parent array or NULL for the root.
    *   - &$parent: The parent element or NULL for the root.
+   * @param bool $post_order
+   *   Use a post-order instead of a pre-order traversal.
    */
-  public static function applyRecursively(array &$element, callable $callback) {
-    $stack = [[&$element, NULL, NULL]];
-    while ($q = array_pop($stack)) {
-      // list() doesn’t work here as it breaks references.
-      $callback($q[0], $q[1], $q[2]);
-      foreach (array_reverse(element_children($q[0])) as $key) {
-        $stack[] = [&$q[0][$key], $key, &$q[0]];
-      }
+  public static function applyRecursively(array &$element, callable $callback, $post_order = FALSE) {
+    if ($post_order) {
+      static::applyRecursivelyPostOrder($element, $callback);
     }
+    else {
+      static::applyRecursivelyPreOrder($element, $callback);
+    }
+  }
+
+  /**
+   * Apply a callback recursively in pre-order.
+   */
+  protected static function applyRecursivelyPreOrder(array &$element, callable $callback, &$parent = NULL, $key = NULL) {
+    $callback($element, $key, $parent);
+    foreach ((element_children($element)) as $child_key) {
+      static::applyRecursivelyPreOrder($element[$child_key], $callback, $element, $child_key);
+    }
+  }
+
+  /**
+   * Apply a callback recursively in post-order.
+   */
+  protected static function applyRecursivelyPostOrder(array &$element, callable $callback, &$parent = NULL, $key = NULL) {
+    foreach ((element_children($element)) as $child_key) {
+      static::applyRecursivelyPostOrder($element[$child_key], $callback, $element, $child_key);
+    }
+    $callback($element, $key, $parent);
   }
 
 }
