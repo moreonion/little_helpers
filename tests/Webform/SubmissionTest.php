@@ -2,10 +2,12 @@
 
 namespace Drupal\little_helpers\Webform;
 
+use Upal\DrupalUnitTestCase;
+
 /**
  * Test webform submission wrapper.
  */
-class SubmissionTest extends \DrupalUnitTestCase {
+class SubmissionTest extends DrupalUnitTestCase {
 
   /**
    * Test getting values for a component.

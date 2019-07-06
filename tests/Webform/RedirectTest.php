@@ -2,10 +2,12 @@
 
 namespace Drupal\little_helpers\Webform;
 
+use Upal\DrupalUnitTestCase;
+
 /**
  * Test redirects after a webform submission.
  */
-class RedirectTest extends \DrupalUnitTestCase {
+class RedirectTest extends DrupalUnitTestCase {
 
   /**
    * Generate a submission stub object.
