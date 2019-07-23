@@ -35,6 +35,7 @@ class Instance {
 
   public static function load($field_name, $entity_type, $bundle) {
     $data = \field_read_instance($entity_type, $field_name, $bundle);
+    $data = ['field' => Field::byName($field_name), 'bundle' => new Bundle($entity_type, $bundle)] + $data;
     return new static($data);
   }
 
