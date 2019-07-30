@@ -41,6 +41,7 @@ function _little_helpers_webform_redirect_alter(array $form, array &$form_state)
  */
 function little_helpers_webform_confirm_email_confirmation_redirect_alter(&$redirect, $node, $submission) {
   $submission = new Submission($node, $submission);
+  $submission->confirmed = 1;
   $r = FormRedirect::fromFormStateRedirect($redirect);
   drupal_alter('webform_redirect', $r, $submission);
   $redirect = $r->toFormStateRedirect();
