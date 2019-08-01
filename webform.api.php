@@ -26,6 +26,6 @@ function hook_webform_submission_confirmed(Submission $submission) {
  * @param \Drupal\little_helpers\Webform\Submission $submission
  *   The submission that is about to be finished.
  */
-function hook_webform_redirect_alter(FormRedirect &$redirect, Submission $submission = NULL) {
+function hook_webform_redirect_alter(FormRedirect &$redirect, Submission $submission) {
   $redirect->query['utm_source'] = 'my-tracking-parameter';
 }

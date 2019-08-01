@@ -3,11 +3,12 @@
 namespace Drupal\little_helpers\Test\Webform;
 
 use Drupal\little_helpers\Webform\Webform;
+use Upal\DrupalUnitTestCase;
 
 /**
  * Test creating a submission object from various form states.
  */
-class FormStateTest extends \DrupalWebTestCase {
+class FormStateTest extends DrupalUnitTestCase {
   protected $webformNode = NULL;
 
   /**

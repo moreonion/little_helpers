@@ -2,10 +2,12 @@
 
 namespace Drupal\little_helpers\Webform;
 
+use Upal\DrupalUnitTestCase;
+
 /**
  * Test CRUD operations for webform submissions.
  */
-class SubmissionIntegrationTest extends \DrupalUnitTestCase {
+class SubmissionIntegrationTest extends DrupalUnitTestCase {
 
   /**
    * Set up a test node and submission.

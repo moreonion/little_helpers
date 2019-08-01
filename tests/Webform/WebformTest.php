@@ -3,11 +3,12 @@
 namespace Drupal\little_helpers\Test\Webform;
 
 use Drupal\little_helpers\Webform\Webform;
+use Upal\DrupalUnitTestCase;
 
 /**
  * Test the webform node wrapper.
  */
-class WebformTest extends \DrupalUnitTestCase {
+class WebformTest extends DrupalUnitTestCase {
 
   /**
    * Create a node stub.
