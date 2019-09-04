@@ -64,14 +64,21 @@ class RedirectTest extends DrupalUnitTestCase {
    */
   public function testAlterRedirectAfterConfirmationEmail() {
     $submission = $this->submissionStub();
-    $redirect = 'https://example.com?bar=baz#test';
+    $redirect = [
+      'path' => 'https://example.com?bar=baz#test',
+      'code' => 302,
+      'query' => [
+        'sid'     => $submission->sid,
+        'confirm' => TRUE,
+        'token'   => md5($submission->submitted . $submission->sid . drupal_get_private_key()),
+      ],
+    ];
     little_helpers_webform_confirm_email_confirmation_redirect_alter($redirect, $submission->node, $submission);
     $this->assertEqual([
-      'https://example.com',
-      [
-        'query' => ['test' => 'foo', 'bar' => 'baz'],
-        'fragment' => 'testbar',
-      ],
+      'path' => 'https://example.com',
+      'query' => ['test' => 'foo', 'bar' => 'baz'],
+      'fragment' => 'testbar',
+      'code' => 302,
     ], $redirect);
   }
 
