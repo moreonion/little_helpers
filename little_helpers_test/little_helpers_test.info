@@ -3,3 +3,6 @@ description = This is used for testing only.
 core = 7.x
 package = Other
 hidden = TRUE
+
+dependencies[] = little_helpers
+dependencies[] = webform
