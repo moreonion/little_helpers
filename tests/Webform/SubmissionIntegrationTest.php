@@ -33,6 +33,14 @@ class SubmissionIntegrationTest extends DrupalUnitTestCase {
   }
 
   /**
+   * Remove the test node.
+   */
+  public function tearDown() {
+    node_delete($this->node->nid);
+    parent::tearDown();
+  }
+
+  /**
    * Test modifying a submission.
    */
   public function testSaveUpdate() {
@@ -57,11 +65,21 @@ class SubmissionIntegrationTest extends DrupalUnitTestCase {
   }
 
   /**
-   * Remove the test node.
+   * Test whether hook_webform_submission_confirmed() is called.
    */
-  public function tearDown() {
-    node_delete($this->node->nid);
-    parent::tearDown();
+  public function testConfirmedHook() {
+    // The submission has been saved as draft so the hook shouldn’t be called.
+    $this->assertFalse(!empty($this->submission->confirmed_hook_called));
+
+    $this->submission->is_draft = FALSE;
+    webform_submission_update($this->node, $this->submission);
+    // First save as non-draft should trigger the confirmed hook.
+    $this->assertTrue(!empty($this->submission->confirmed_hook_called));
+
+    $this->submission->confirmed_hook_called = FALSE;
+    webform_submission_update($this->node, $this->submission);
+    // Saving the submission again shouldn’t called the hook.
+    $this->assertFalse(!empty($this->submission->confirmed_hook_called));
   }
 
 }

@@ -15,3 +15,10 @@ function little_helpers_test_webform_redirect_alter(FormRedirect $redirect, Subm
   $redirect->query['test'] = 'foo';
   $redirect->fragment .= 'bar';
 }
+
+/**
+ * Implements hook_webform_submission_confirmed().
+ */
+function little_helpers_test_webform_submission_confirmed(Submission $submission) {
+  $submission->confirmed_hook_called = TRUE;
+}
