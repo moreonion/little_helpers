@@ -61,7 +61,7 @@ function little_helpers_webform_submission_insert($node, $submission) {
  * @see little_helpers_webform_submission_update() to only invoke the hook once.
  */
 function little_helpers_webform_submission_presave($node, $submission) {
-  $submission->new_or_was_draft = empty($submission->sid) || empty($submission->complete);
+  $submission->new_or_was_draft = empty($submission->sid) || empty($submission->completed);
 }
 
 /**
