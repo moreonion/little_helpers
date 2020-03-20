@@ -103,7 +103,7 @@ class Client {
    * This method does the actual hard-work in this class.
    */
   protected function send($path, array $query = [], $data = NULL, array $options = []) {
-    if (!$path || $path{0} != '/') {
+    if (!$path || $path[0] != '/') {
       $path = '/' . $path;
     }
     if ($query) {
