@@ -48,7 +48,7 @@ class Container {
   /**
    * Create a new loader instance.
    */
-  public function __construct($specs = [], $name = 'loader') {
+  public function __construct($specs = [], $name = 'container') {
     $this->instances[$name] = $this;
     $this->specs = $specs;
   }

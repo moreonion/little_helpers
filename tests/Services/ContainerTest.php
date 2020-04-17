@@ -102,4 +102,21 @@ class ContainerTest extends DrupalUnitTestCase {
     $this->assertFalse($container->loadService('unknown', FALSE));
   }
 
+  /**
+   * Test injecting an object.
+   */
+  public function testInjection() {
+    $container = new Container([]);
+    $container->inject('foo', 'bar');
+    $this->assertEqual('bar', $container->loadService('foo'));
+  }
+
+  /**
+   * Test self registration as service.
+   */
+  public function testGettingContainerAsService() {
+    $container = new Container([]);
+    $this->assertSame($container, $container->loadService('container'));
+  }
+
 }
