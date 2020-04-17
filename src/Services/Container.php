@@ -63,18 +63,16 @@ class Container {
    *   then a boolean FALSE will be returned instead.
    */
   public function loadService($name, $exception = TRUE) {
-    if (!isset($this->instances[$name])) {
-      if (!isset($this->specs[$name])) {
-        if ($exception) {
-          throw new \Exception("Unknown service: $name");
-        }
-        else {
-          return FALSE;
-        }
-      }
-      $this->instances[$name] = $this->loadFromSpec($this->specs[$name]);
+    if ($service = $this->instances[$name] ?? NULL) {
+      return $service;
     }
-    return $this->instances[$name];
+    if ($spec = $this->specs[$name] ?? NULL) {
+      return $this->instances[$name] = $this->loadFromSpec($spec);
+    }
+    if ($exception) {
+      throw new UnknownServiceException("Unknown service: $name");
+    }
+    return FALSE;
   }
 
   /**

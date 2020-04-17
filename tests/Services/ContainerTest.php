@@ -84,4 +84,22 @@ class ContainerTest extends DrupalUnitTestCase {
     $this->assertEqual([\SplFixedArray::fromArray([1, 2, 3])], $a->toArray());
   }
 
+  /**
+   * Test loading an unknown service.
+   *
+   * @expectedException \Drupal\little_helpers\Services\UnknownServiceException
+   */
+  public function testUnknownServiceException() {
+    $container = new Container([]);
+    $container->loadService('unknown');
+  }
+
+  /**
+   * Test loading an unknown service without exception.
+   */
+  public function testUnknownService() {
+    $container = new Container([]);
+    $this->assertFalse($container->loadService('unknown', FALSE));
+  }
+
 }
