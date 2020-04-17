@@ -55,11 +55,22 @@ class Container {
 
   /**
    * Load a service by name.
+   *
+   * @param string $name
+   *   Name of the service to load.
+   * @param bool $exception
+   *   Whether to throw an exception if the service can’t be loaded. If FALSE
+   *   then a boolean FALSE will be returned instead.
    */
-  public function loadService($name) {
+  public function loadService($name, $exception = TRUE) {
     if (!isset($this->instances[$name])) {
       if (!isset($this->specs[$name])) {
-        throw new \Exception("Unknown service: $name");
+        if ($exception) {
+          throw new \Exception("Unknown service: $name");
+        }
+        else {
+          return FALSE;
+        }
       }
       $this->instances[$name] = $this->loadFromSpec($this->specs[$name]);
     }
