@@ -46,6 +46,13 @@ class Spec {
   protected $calls;
 
   /**
+   * The container used to resolve services in arguments.
+   *
+   * @var Drupal\little_helpers\Services\Container
+   */
+  protected $container;
+
+  /**
    * Create a new instance from a info array or string.
    *
    * @param string|array $info
@@ -81,11 +88,18 @@ class Spec {
   }
 
   /**
+   * Set the container.
+   */
+  public function setContainer(Container $container) {
+    $this->container = $container;
+  }
+
+  /**
    * Create a new class instance based on the spec.
    */
-  public function instantiate(Container $container) {
+  public function instantiate() {
     $class = $this->class;
-    $arguments = $container->resolveServices($this->arguments);
+    $arguments = $this->container->resolveServices($this->arguments);
     if ($method = $this->constructor) {
       $instance = $class::$method(...$arguments);
     }
@@ -95,7 +109,7 @@ class Spec {
 
     foreach ($this->calls as $call) {
       list($method, $arguments) = $call;
-      $arguments = $container->resolveServices($arguments);
+      $arguments = $this->container->resolveServices($arguments);
       $instance->$method(...$arguments);
     }
     return $instance;

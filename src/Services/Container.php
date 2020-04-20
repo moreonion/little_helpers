@@ -101,7 +101,8 @@ class Container {
     if (!($spec instanceof Spec)) {
       $spec = Spec::fromInfo($spec);
     }
-    return $spec->instantiate($this);
+    $spec->setContainer($this);
+    return $spec->instantiate();
   }
 
   /**
