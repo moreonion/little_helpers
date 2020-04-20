@@ -26,8 +26,10 @@ class Spec {
   /**
    * Array of arguments that should be passed to the constructor.
    *
-   * If an argument is a string starting with '@' the service with the name will
-   * be passed instead.
+   * Special string arguments:
+   * - Arguments starting with '@' are replaced with the service of that name.
+   * - Arguments starting with '%' are replaced with a keyword argument passed
+   *   add instantiation time.
    *
    * @var array
    */
@@ -38,8 +40,8 @@ class Spec {
    *
    * Each item should be an array with two values:
    * - The method to be invoked.
-   * - The arguments to be passed to the method. String arguments prefixed with
-   *   an '@' are resolved to a service of the same name.
+   * - The arguments to be passed to the method. Special arguments work the same
+   *   as for $arguments.
    *
    * @var array
    */
@@ -96,10 +98,13 @@ class Spec {
 
   /**
    * Create a new class instance based on the spec.
+   *
+   * @param array $kwargs
+   *   Associative array of keyword arguments that may be passed as arguments.
    */
-  public function instantiate() {
+  public function instantiate(array $kwargs = []) {
     $class = $this->class;
-    $arguments = $this->resolveArguments($this->arguments);
+    $arguments = $this->resolveArguments($this->arguments, $kwargs);
     if ($method = $this->constructor) {
       $instance = $class::$method(...$arguments);
     }
@@ -109,7 +114,7 @@ class Spec {
 
     foreach ($this->calls as $call) {
       list($method, $arguments) = $call;
-      $arguments = $this->resolveArguments($arguments);
+      $arguments = $this->resolveArguments($arguments, $kwargs);
       $instance->$method(...$arguments);
     }
     return $instance;
@@ -118,10 +123,20 @@ class Spec {
   /**
    * Resolve all special arguments in the argument array.
    */
-  protected function resolveArguments(array $spec_args) {
+  protected function resolveArguments(array $spec_args, array $kwargs) {
+    $resolvers = [
+      '@' => [$this->container, 'loadService'],
+      '%' => function ($key) use ($kwargs) {
+        if (!array_key_exists($key, $kwargs)) {
+          throw new MissingArgumentException("Argument %{$key} was referenced in the spec but was not passed in kwargs.");
+        }
+        return $kwargs[$key];
+      },
+    ];
     foreach ($spec_args as &$arg) {
-      if (is_string($arg) && $arg[0] == '@') {
-        $arg = $this->container->loadService(substr($arg, 1));
+      if (is_string($arg) && $arg && ($resolver = $resolvers[$arg[0]] ?? NULL)) {
+        $name = substr($arg, 1);
+        $arg = $resolver($name);
       }
     }
     return $spec_args;

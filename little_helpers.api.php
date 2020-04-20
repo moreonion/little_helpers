@@ -19,7 +19,7 @@ function hook_little_helpers_services() {
     'class' => '\\SplQueue',
     'calls' => [
       ['push', [1]],
-      ['push', ['@a']],
+      ['push', ['@other_service']],
     ],
   ];
   return $info;
