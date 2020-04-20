@@ -99,7 +99,7 @@ class Spec {
    */
   public function instantiate() {
     $class = $this->class;
-    $arguments = $this->container->resolveServices($this->arguments);
+    $arguments = $this->resolveArguments($this->arguments);
     if ($method = $this->constructor) {
       $instance = $class::$method(...$arguments);
     }
@@ -109,10 +109,22 @@ class Spec {
 
     foreach ($this->calls as $call) {
       list($method, $arguments) = $call;
-      $arguments = $this->container->resolveServices($arguments);
+      $arguments = $this->resolveArguments($arguments);
       $instance->$method(...$arguments);
     }
     return $instance;
+  }
+
+  /**
+   * Resolve all special arguments in the argument array.
+   */
+  protected function resolveArguments(array $spec_args) {
+    foreach ($spec_args as &$arg) {
+      if (is_string($arg) && $arg[0] == '@') {
+        $arg = $this->container->loadService(substr($arg, 1));
+      }
+    }
+    return $spec_args;
   }
 
 }

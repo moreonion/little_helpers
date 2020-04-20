@@ -76,18 +76,6 @@ class Container {
   }
 
   /**
-   * Resolve all service-like strings in an array of arguments.
-   */
-  public function resolveServices(array $args) {
-    foreach ($args as &$arg) {
-      if (is_string($arg) && $arg[0] == '@') {
-        $arg = $this->loadService(substr($arg, 1));
-      }
-    }
-    return $args;
-  }
-
-  /**
    * Create a new instance of a class based on an array specification.
    *
    * @param mixed $spec
