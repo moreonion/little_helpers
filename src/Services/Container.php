@@ -31,18 +31,10 @@ class Container {
   public static function get() {
     $instance = &drupal_static(__CLASS__);
     if (!$instance) {
-      $instance = static::fromInfo();
+      $instance = new static();
+      $instance->loadSpecsFromHook('little_helpers_services');
     }
     return $instance;
-  }
-
-  /**
-   * Get specs by invoking the hooks then create a new instance.
-   */
-  public static function fromInfo() {
-    $specs = module_invoke_all('little_helpers_services');
-    drupal_alter('little_helpers_services', $specs);
-    return new static($specs);
   }
 
   /**
@@ -70,6 +62,25 @@ class Container {
       return $this->instances[$name] = $spec->instantiate();
     }
     return FALSE;
+  }
+
+  /**
+   * Load specs by invoking a hook.
+   *
+   * @param string $hook
+   *   Name of the hook to invoke.
+   * @param mixed ...$arguments
+   *   Arguments that should be passed to the hook invocations.
+   */
+  public function loadSpecsFromHook(string $hook, ...$arguments) {
+    $specs = module_invoke_all($hook, ...$arguments);
+    foreach ($specs as &$spec) {
+      if (!is_array($spec)) {
+        $spec = ['class' => $spec];
+      }
+    }
+    drupal_alter($hook, $specs, ...$arguments);
+    $this->specs += $specs;
   }
 
   /**
