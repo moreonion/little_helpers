@@ -54,7 +54,7 @@ class Container {
   }
 
   /**
-   * Load a service by name.
+   * Load a (possibly cached) service by name.
    *
    * @param string $name
    *   Name of the service to load.
@@ -62,35 +62,38 @@ class Container {
    *   Whether to throw an exception if the service can’t be loaded. If FALSE
    *   then a boolean FALSE will be returned instead.
    */
-  public function loadService($name, $exception = TRUE) {
+  public function loadService(string $name, bool $exception = TRUE) {
     if ($service = $this->instances[$name] ?? NULL) {
       return $service;
     }
-    if ($spec = $this->specs[$name] ?? NULL) {
-      return $this->instances[$name] = $this->loadFromSpec($spec);
-    }
-    if ($exception) {
-      throw new UnknownServiceException("Unknown service: $name");
+    if ($spec = $this->getSpec($name, $exception)) {
+      return $this->instances[$name] = $spec->instantiate();
     }
     return FALSE;
   }
 
   /**
-   * Create a new instance of a class based on an array specification.
+   * Get a spec to for creating a new instance of the referenced class.
    *
-   * @param mixed $spec
-   *   A spec can either be a fully qualified class name or an array with at
-   *   least one member 'class' which must be a fully qualified class name.
+   * @param string $name
+   *   Name of the spec to be loaded.
+   * @param bool $exception
+   *   Whether to throw an exception if no spec with the name exists. If FALSE
+   *   then a boolean FALSE will be returned instead.
    *
-   * @return mixed
-   *   A class instance created as described in the spec.
+   * @return \Drupal\little_helpers\Services\Spec
+   *   The registered spec for the $name.
    */
-  public function loadFromSpec($spec) {
-    if (!($spec instanceof Spec)) {
+  public function getSpec(string $name, bool $exception = TRUE) {
+    if ($spec = $this->specs[$name] ?? NULL) {
       $spec = Spec::fromInfo($spec);
+      $spec->setContainer($this);
+      return $spec;
     }
-    $spec->setContainer($this);
-    return $spec->instantiate();
+    if ($exception) {
+      throw new UnknownServiceException("Unknown service: $name");
+    }
+    return FALSE;
   }
 
   /**

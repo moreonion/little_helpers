@@ -119,4 +119,19 @@ class ContainerTest extends DrupalUnitTestCase {
     $this->assertSame($container, $container->loadService('container'));
   }
 
+  /**
+   * Test getSpec() and instantiate() with keyword arguments.
+   */
+  public function testLoadWithKwargs() {
+    $container = new Container([
+      'fixed_array' => [
+        'class' => \SplFixedArray::class,
+        'constructor' => 'fromArray',
+        'arguments' => ['%initial'],
+      ],
+    ]);
+    $a = $container->getSpec('fixed_array')->instantiate(['initial' => [1, 2, 3]]);
+    $this->assertEqual([1, 2, 3], $a->toArray());
+  }
+
 }
