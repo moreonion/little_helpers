@@ -26,6 +26,13 @@ class Container {
   protected $instances = [];
 
   /**
+   * Container used to resolve service references in specs.
+   *
+   * @var \Drupal\little_helpers\Services\Container
+   */
+  protected $container = NULL;
+
+  /**
    * Create or get the singleton container instance.
    */
   public static function get() {
@@ -84,6 +91,16 @@ class Container {
   }
 
   /**
+   * Set the container used to resolve service references in specs.
+   *
+   * @param \Drupal\little_helper\Services\Container
+   *   The container instance to set.
+   */
+  public function setContainer(Container $container) {
+    $this->container = $container;
+  }
+
+  /**
    * Get a spec to for creating a new instance of the referenced class.
    *
    * @param string $name
@@ -98,7 +115,7 @@ class Container {
   public function getSpec(string $name, bool $exception = TRUE) {
     if ($spec = $this->specs[$name] ?? NULL) {
       $spec = Spec::fromInfo($spec);
-      $spec->setContainer($this);
+      $spec->setContainer($this->container ?? $this);
       return $spec;
     }
     if ($exception) {

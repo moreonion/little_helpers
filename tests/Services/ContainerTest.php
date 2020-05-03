@@ -134,4 +134,23 @@ class ContainerTest extends DrupalUnitTestCase {
     $this->assertEqual([1, 2, 3], $a->toArray());
   }
 
+  /**
+   * Test instantiation with parent container.
+   */
+  public function testSetContainer() {
+    $container = new Container([]);
+    $container->inject('foo', 'bar');
+    $container2 = new Container([
+      'queue' => [
+        'class' => \SplStack::class,
+        'calls' => [
+          ['push', ['@foo']],
+        ],
+      ],
+    ]);
+    $container2->setContainer($container);
+    $q = $container2->loadService('queue');
+    $this->assertEqual('bar', $q->top());
+  }
+
 }
