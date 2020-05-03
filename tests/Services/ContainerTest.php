@@ -190,4 +190,19 @@ class ContainerTest extends DrupalUnitTestCase {
     $this->assertEqual('baz', $container->loadService('y')->top());
   }
 
+  /**
+   * Test spec defaults.
+   */
+  public function testDefaults() {
+    $defaults = [
+      'class' => \SplStack::class,
+      'calls' => [['push', ['bar']]],
+    ];
+    $container = new Container();
+    $container->setDefaults($defaults);
+    $container->setSpecs(['queue' => []]);
+    $q = $container->loadService('queue');
+    $this->assertEqual('bar', $q->top());
+  }
+
 }

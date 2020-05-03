@@ -33,6 +33,13 @@ class Container {
   protected $container = NULL;
 
   /**
+   * Default values to merge into specs.
+   *
+   * @var array
+   */
+  protected $defaults = [];
+
+  /**
    * Create or get the singleton container instance.
    */
   public static function get() {
@@ -117,7 +124,7 @@ class Container {
    *   The modified spec.
    */
   protected function process(array $spec) {
-    return $spec;
+    return $spec + $this->defaults;
   }
 
   /**
@@ -140,6 +147,16 @@ class Container {
    */
   public function setSpecs(array $specs) {
     $this->specs = array_replace($this->specs, $this->processInfo($specs));
+  }
+
+  /**
+   * Set the spec defaults.
+   *
+   * @param array $defaults
+   *   Default values to merge into all specs.
+   */
+  public function setDefaults(array $defaults) {
+    $this->defaults = $defaults;
   }
 
   /**
