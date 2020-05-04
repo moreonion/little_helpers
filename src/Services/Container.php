@@ -80,14 +80,42 @@ class Container {
    *   Arguments that should be passed to the hook invocations.
    */
   public function loadSpecsFromHook(string $hook, ...$arguments) {
-    $specs = module_invoke_all($hook, ...$arguments);
-    foreach ($specs as &$spec) {
-      if (!is_array($spec)) {
-        $spec = ['class' => $spec];
-      }
-    }
+    $info = module_invoke_all($hook, ...$arguments);
+    $specs = $this->processInfo($info);
     drupal_alter($hook, $specs, ...$arguments);
     $this->specs += $specs;
+  }
+
+  /**
+   * Turn hook info into specs.
+   *
+   * @param array $info
+   *   Result of a hook invocation.
+   *
+   * @return array
+   *   The processed specs.
+   */
+  protected function processInfo(array $info) {
+     foreach ($info as &$spec) {
+       if (!is_array($spec)) {
+         $spec = ['class' => $spec];
+       }
+      $spec = $this->process($spec);
+     }
+    return $info;
+  }
+
+  /**
+   * Additional processing for a single spec (ie. add defaults).
+   *
+   * @param array $spec
+   *   The spec to add default to.
+   *
+   * @return array
+   *   The modified spec.
+   */
+  protected function process(array $spec) {
+    return $spec;
   }
 
   /**
