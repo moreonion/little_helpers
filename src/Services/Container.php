@@ -46,8 +46,13 @@ class Container {
 
   /**
    * Create a new loader instance.
+   *
+   * @param array $specs
+   *   The initial set of specs.
+   * @param string $name
+   *   The service name of the container itself. (default: 'container').
    */
-  public function __construct($specs = [], $name = 'container') {
+  public function __construct(array $specs = [], string $name = 'container') {
     $this->instances[$name] = $this;
     $this->specs = $specs;
   }
