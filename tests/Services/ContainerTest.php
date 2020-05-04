@@ -14,7 +14,9 @@ class ContainerTest extends DrupalUnitTestCase {
    */
   public function testStringSpec() {
     $class_a = get_class($this->createMock('stdclass'));
-    $container = new Container(['a' => $class_a]);
+    $specs['a'] = $class_a;
+    $container = new Container();
+    $container->setSpecs($specs);
     $a = $container->loadService('a');
     $this->assertInstanceOf($class_a, $a);
   }
@@ -27,7 +29,8 @@ class ContainerTest extends DrupalUnitTestCase {
       'class' => \SplFixedArray::class,
       'arguments' => [1],
     ];
-    $container = new Container($specs);
+    $container = new Container();
+    $container->setSpecs($specs);
     $a = $container->loadService('a');
     $this->assertEqual(1, $a->getSize());
   }
@@ -41,7 +44,8 @@ class ContainerTest extends DrupalUnitTestCase {
       'constructor' => 'fromArray',
       'arguments' => [[1, 2, 3]],
     ];
-    $container = new Container($specs);
+    $container = new Container();
+    $container->setSpecs($specs);
     $a = $container->loadService('a');
     $this->assertEqual([1, 2, 3], $a->toArray());
   }
@@ -58,7 +62,8 @@ class ContainerTest extends DrupalUnitTestCase {
         ['offsetSet', [1, 2]],
       ],
     ];
-    $container = new Container($specs);
+    $container = new Container();
+    $container->setSpecs($specs);
     $a = $container->loadService('a');
     $this->assertEqual([1, 2], $a->toArray());
   }
@@ -79,7 +84,8 @@ class ContainerTest extends DrupalUnitTestCase {
         ['offsetSet', [0, '@a']],
       ],
     ];
-    $container = new Container($specs);
+    $container = new Container();
+    $container->setSpecs($specs);
     $a = $container->loadService('nested_a');
     $this->assertEqual([\SplFixedArray::fromArray([1, 2, 3])], $a->toArray());
   }
@@ -90,7 +96,7 @@ class ContainerTest extends DrupalUnitTestCase {
    * @expectedException \Drupal\little_helpers\Services\UnknownServiceException
    */
   public function testUnknownServiceException() {
-    $container = new Container([]);
+    $container = new Container();
     $container->loadService('unknown');
   }
 
@@ -98,7 +104,7 @@ class ContainerTest extends DrupalUnitTestCase {
    * Test loading an unknown service without exception.
    */
   public function testUnknownService() {
-    $container = new Container([]);
+    $container = new Container();
     $this->assertFalse($container->loadService('unknown', FALSE));
   }
 
@@ -106,7 +112,7 @@ class ContainerTest extends DrupalUnitTestCase {
    * Test injecting an object.
    */
   public function testInjection() {
-    $container = new Container([]);
+    $container = new Container();
     $container->inject('foo', 'bar');
     $this->assertEqual('bar', $container->loadService('foo'));
   }
@@ -115,7 +121,7 @@ class ContainerTest extends DrupalUnitTestCase {
    * Test self registration as service.
    */
   public function testGettingContainerAsService() {
-    $container = new Container([]);
+    $container = new Container();
     $this->assertSame($container, $container->loadService('container'));
   }
 
@@ -123,7 +129,8 @@ class ContainerTest extends DrupalUnitTestCase {
    * Test getSpec() and instantiate() with keyword arguments.
    */
   public function testLoadWithKwargs() {
-    $container = new Container([
+    $container = new Container();
+    $container->setSpecs([
       'fixed_array' => [
         'class' => \SplFixedArray::class,
         'constructor' => 'fromArray',
@@ -138,9 +145,10 @@ class ContainerTest extends DrupalUnitTestCase {
    * Test instantiation with parent container.
    */
   public function testSetContainer() {
-    $container = new Container([]);
+    $container = new Container();
     $container->inject('foo', 'bar');
-    $container2 = new Container([
+    $container2 = new Container();
+    $container2->setSpecs([
       'queue' => [
         'class' => \SplStack::class,
         'calls' => [
@@ -151,6 +159,35 @@ class ContainerTest extends DrupalUnitTestCase {
     $container2->setContainer($container);
     $q = $container2->loadService('queue');
     $this->assertEqual('bar', $q->top());
+  }
+
+  /**
+   * Test that new specs overwrite old specs.
+   */
+  public function testSetSpecsOverwrites() {
+    $container = new Container();
+    $specs1['x'] = [
+      'class' => \SplStack::class,
+      'calls' => [
+        ['push', ['foo']],
+      ],
+    ];
+    $specs1['y'] = [
+      'class' => \SplStack::class,
+      'calls' => [
+        ['push', ['baz']],
+      ],
+    ];
+    $container->setSpecs($specs1);
+    $specs2['x'] = [
+      'class' => \SplStack::class,
+      'calls' => [
+        ['push', ['bar']],
+      ],
+    ];
+    $container->setSpecs($specs2);
+    $this->assertEqual('bar', $container->loadService('x')->top());
+    $this->assertEqual('baz', $container->loadService('y')->top());
   }
 
 }

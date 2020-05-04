@@ -47,14 +47,11 @@ class Container {
   /**
    * Create a new loader instance.
    *
-   * @param array $specs
-   *   The initial set of specs.
    * @param string $name
    *   The service name of the container itself. (default: 'container').
    */
-  public function __construct(array $specs = [], string $name = 'container') {
+  public function __construct(string $name = 'container') {
     $this->instances[$name] = $this;
-    $this->specs = $specs;
   }
 
   /**
@@ -88,7 +85,7 @@ class Container {
     $info = module_invoke_all($hook, ...$arguments);
     $specs = $this->processInfo($info);
     drupal_alter($hook, $specs, ...$arguments);
-    $this->specs += $specs;
+    $this->specs = array_replace($this->specs, $specs);
   }
 
   /**
@@ -131,6 +128,18 @@ class Container {
    */
   public function setContainer(Container $container) {
     $this->container = $container;
+  }
+
+  /**
+   * Add specs to the registry.
+   *
+   * Existing specs with the same name are overridden.
+   *
+   * @param array $specs
+   *   The specs to add.
+   */
+  public function setSpecs(array $specs) {
+    $this->specs = array_replace($this->specs, $this->processInfo($specs));
   }
 
   /**
