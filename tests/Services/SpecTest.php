@@ -41,4 +41,12 @@ class SpecTest extends DrupalUnitTestCase {
     $spec->instantiate();
   }
 
+  /**
+   * Test that Spec::fromInfo() can handle class-only string specs.
+   */
+  public function testFromInfoHandlesStrings() {
+    $a = Spec::fromInfo(\SplFixedArray::class)->instantiate();
+    $this->assertInstanceOf(\SplFixedArray::class, $a);
+  }
+
 }
