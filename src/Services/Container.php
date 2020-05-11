@@ -26,6 +26,20 @@ class Container {
   protected $instances = [];
 
   /**
+   * Container used to resolve service references in specs.
+   *
+   * @var \Drupal\little_helpers\Services\Container
+   */
+  protected $container = NULL;
+
+  /**
+   * Default values to merge into specs.
+   *
+   * @var array
+   */
+  protected $defaults = [];
+
+  /**
    * Create or get the singleton container instance.
    */
   public static function get() {
@@ -39,10 +53,12 @@ class Container {
 
   /**
    * Create a new loader instance.
+   *
+   * @param string $name
+   *   The service name of the container itself. (default: 'container').
    */
-  public function __construct($specs = [], $name = 'container') {
+  public function __construct(string $name = 'container') {
     $this->instances[$name] = $this;
-    $this->specs = $specs;
   }
 
   /**
@@ -73,14 +89,74 @@ class Container {
    *   Arguments that should be passed to the hook invocations.
    */
   public function loadSpecsFromHook(string $hook, ...$arguments) {
-    $specs = module_invoke_all($hook, ...$arguments);
-    foreach ($specs as &$spec) {
-      if (!is_array($spec)) {
-        $spec = ['class' => $spec];
-      }
-    }
+    $info = module_invoke_all($hook, ...$arguments);
+    $specs = $this->processInfo($info);
     drupal_alter($hook, $specs, ...$arguments);
-    $this->specs += $specs;
+    $this->specs = array_replace($this->specs, $specs);
+  }
+
+  /**
+   * Turn hook info into specs.
+   *
+   * @param array $info
+   *   Result of a hook invocation.
+   *
+   * @return array
+   *   The processed specs.
+   */
+  protected function processInfo(array $info) {
+     foreach ($info as &$spec) {
+       if (!is_array($spec)) {
+         $spec = ['class' => $spec];
+       }
+      $spec = $this->process($spec);
+     }
+    return $info;
+  }
+
+  /**
+   * Additional processing for a single spec (ie. add defaults).
+   *
+   * @param array $spec
+   *   The spec to add default to.
+   *
+   * @return array
+   *   The modified spec.
+   */
+  protected function process(array $spec) {
+    return $spec + $this->defaults;
+  }
+
+  /**
+   * Set the container used to resolve service references in specs.
+   *
+   * @param \Drupal\little_helper\Services\Container
+   *   The container instance to set.
+   */
+  public function setContainer(Container $container) {
+    $this->container = $container;
+  }
+
+  /**
+   * Add specs to the registry.
+   *
+   * Existing specs with the same name are overridden.
+   *
+   * @param array $specs
+   *   The specs to add.
+   */
+  public function setSpecs(array $specs) {
+    $this->specs = array_replace($this->specs, $this->processInfo($specs));
+  }
+
+  /**
+   * Set the spec defaults.
+   *
+   * @param array $defaults
+   *   Default values to merge into all specs.
+   */
+  public function setDefaults(array $defaults) {
+    $this->defaults = $defaults;
   }
 
   /**
@@ -98,7 +174,7 @@ class Container {
   public function getSpec(string $name, bool $exception = TRUE) {
     if ($spec = $this->specs[$name] ?? NULL) {
       $spec = Spec::fromInfo($spec);
-      $spec->setContainer($this);
+      $spec->setContainer($this->container ?? $this);
       return $spec;
     }
     if ($exception) {

@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\little_helpers\Services\Container;
 use Drupal\little_helpers\System\FormRedirect;
 use Drupal\little_helpers\Webform\Submission;
 
@@ -21,4 +22,17 @@ function little_helpers_test_webform_redirect_alter(FormRedirect $redirect, Subm
  */
 function little_helpers_test_webform_submission_confirmed(Submission $submission) {
   $submission->confirmed_hook_called = TRUE;
+}
+
+/**
+ * Implements hook_little_helpers_services().
+ */
+function little_helpers_test_little_helpers_services() {
+  $info['little_helpers_test.loader'] = [
+    'class' => Container::class,
+    'calls' => [
+      ['loadSpecsFromHook', ['little_helpers_test_plugins']],
+    ],
+  ];
+  return $info;
 }
