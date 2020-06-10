@@ -132,6 +132,9 @@ class Spec {
         }
         return $kwargs[$key];
       },
+      '!' => function ($key) {
+        return module_exists('variable') ? variable_get_value($key) : variable_get($key);
+      },
     ];
     foreach ($spec_args as &$arg) {
       if (is_string($arg) && $arg && ($resolver = $resolvers[$arg[0]] ?? NULL)) {
