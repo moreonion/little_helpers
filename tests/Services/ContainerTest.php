@@ -142,6 +142,23 @@ class ContainerTest extends DrupalUnitTestCase {
   }
 
   /**
+   * Test passing config variables as arguments.
+   */
+  public function testLoadWithVariables() {
+    $container = new Container();
+    $container->setSpecs([
+      'fixed_array' => [
+        'class' => \SplFixedArray::class,
+        'constructor' => 'fromArray',
+        'arguments' => ['!initial'],
+      ],
+    ]);
+    $GLOBALS['conf']['initial'] = [1, 2, 3];
+    $a = $container->getSpec('fixed_array')->instantiate();
+    $this->assertEqual([1, 2, 3], $a->toArray());
+  }
+
+  /**
    * Test instantiation with parent container.
    */
   public function testSetContainer() {
