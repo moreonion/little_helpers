@@ -12,7 +12,7 @@ class SubmissionIntegrationTest extends DrupalUnitTestCase {
   /**
    * Set up a test node and submission.
    */
-  public function setUp() {
+  public function setUp() : void {
     parent::setUp();
     module_load_include('inc', 'webform', 'includes/webform.submissions');
     $node = (object) ['title' => 'test webform', 'type' => 'webform'];
@@ -35,7 +35,7 @@ class SubmissionIntegrationTest extends DrupalUnitTestCase {
   /**
    * Remove the test node.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     node_delete($this->node->nid);
     parent::tearDown();
   }
