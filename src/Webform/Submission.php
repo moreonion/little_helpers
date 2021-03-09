@@ -92,9 +92,6 @@ class Submission {
     if ($component = &$this->webform->componentByKey($form_key)) {
       return $this->valuesByCid($component['cid']);
     }
-    elseif (isset($this->submission->tracking->$form_key)) {
-      return [$this->submission->tracking->$form_key];
-    }
     return [];
   }
 
