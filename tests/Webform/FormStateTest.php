@@ -28,7 +28,7 @@ class FormStateTest extends DrupalUnitTestCase {
   /**
    * Enable dependencies, load includes and create a node stub.
    */
-  public function setUp() {
+  public function setUp() : void {
     // Enable any modules required for the test. This should be an array of
     // module names.
     parent::setUp(array('little_helpers'));
@@ -39,7 +39,7 @@ class FormStateTest extends DrupalUnitTestCase {
   /**
    * Remove the node stub.
    */
-  public function tearDown() {
+  public function tearDown() : void {
     node_delete($this->webformNode->nid);
   }
 

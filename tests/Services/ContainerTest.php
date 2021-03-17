@@ -92,11 +92,10 @@ class ContainerTest extends DrupalUnitTestCase {
 
   /**
    * Test loading an unknown service.
-   *
-   * @expectedException \Drupal\little_helpers\Services\UnknownServiceException
    */
   public function testUnknownServiceException() {
     $container = new Container();
+    $this->expectException(UnknownServiceException::class);
     $container->loadService('unknown');
   }
 

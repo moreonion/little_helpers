@@ -29,8 +29,6 @@ class SpecTest extends DrupalUnitTestCase {
 
   /**
    * Test exception when keyword argument is not defined.
-   *
-   * @expectedException \Drupal\little_helpers\Services\MissingArgumentException
    */
   public function testKwargsException() {
     $spec = Spec::fromInfo([
@@ -38,6 +36,7 @@ class SpecTest extends DrupalUnitTestCase {
       'constructor' => 'fromArray',
       'arguments' => ['%initial'],
     ]);
+    $this->expectException(MissingArgumentException::class);
     $spec->instantiate();
   }
 
