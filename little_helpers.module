@@ -79,9 +79,11 @@ function little_helpers_webform_submission_update($node, $submission) {
 /**
  * Implements hook_webform_confirm_email_email_confirmed().
  */
-function little_helpers_webform_confirm_email_email_confirmed($node_or_webform, $submission) {
-  $submission_o = new Submission($node_or_webform, $submission);
-  module_invoke_all('webform_submission_confirmed', $submission_o);
+function little_helpers_webform_confirm_email_email_confirmed($node_or_webform, $submission, $first_confirmation = TRUE) {
+  if ($first_confirmation) {
+    $submission_o = new Submission($node_or_webform, $submission);
+    module_invoke_all('webform_submission_confirmed', $submission_o);
+  }
 }
 
 /**
