@@ -30,6 +30,7 @@ class SubmissionIntegrationTest extends DrupalUnitTestCase {
     $form_state['values']['submitted'][1] = 'test@example.com';
     $this->submission = webform_submission_create($this->node, $GLOBALS['user'], $form_state);
     webform_submission_insert($this->node, $this->submission);
+    $this->submission->confirmed_hook_called = FALSE;
   }
 
   /**
@@ -80,6 +81,20 @@ class SubmissionIntegrationTest extends DrupalUnitTestCase {
     webform_submission_update($this->node, $this->submission);
     // Saving the submission again shouldn’t called the hook.
     $this->assertFalse(!empty($this->submission->confirmed_hook_called));
+  }
+
+  /**
+   * Test hook invocation invocation for confirmation link clicks.
+   */
+  public function testConfirmedHookConfirmationUrl() {
+    $submission = $this->submission;
+    $this->assertFalse($submission->confirmed_hook_called);
+
+    module_invoke_all('webform_confirm_email_email_confirmed', $this->node, $submission, FALSE);
+    $this->assertFalse($submission->confirmed_hook_called);
+
+    module_invoke_all('webform_confirm_email_email_confirmed', $this->node, $submission, TRUE);
+    $this->assertTrue($submission->confirmed_hook_called);
   }
 
 }

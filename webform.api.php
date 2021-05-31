@@ -9,7 +9,7 @@ use Drupal\little_helpers\Webform\Submission;
  * This hook is invoked in two cases:
  * - A submission that doesn't need confirmation is saved as complete for the
  *   its first time.
- * - A submission needing email confirmation is confirmed.
+ * - A submission needing email confirmation is confirmed for the first time.
  *
  * @param \Drupal\little_helpers\Webform\Submission $submission
  *  The submission just having been confirmed / saved.
