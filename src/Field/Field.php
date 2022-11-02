@@ -105,7 +105,7 @@ class Field {
     db_query("RENAME TABLE `field_revision_$o` TO `field_revision_$n`;");
     \module_load_install($this->module);
     $function = $this->module . '_field_schema';
-    $schema = $function(array('type' => $this->type));
+    $schema = $function((array) $this);
     foreach ($schema['columns'] as $column => $specs) {
       db_change_field("field_data_$n", "{$o}_{$column}", "{$n}_{$column}", $specs);
       db_change_field("field_revision_$n", "{$o}_{$column}", "{$n}_{$column}", $specs);
