@@ -124,6 +124,11 @@ class Client {
     $options += $this->options;
     $result = $this->sendRequest($url, $options);
 
+    // Decode result data if compressed.
+    if ($result->headers['content-encoding'] ?? '' == 'gzip') {
+      $result->data = gzdecode($result->data);
+    }
+
     // Turn errors into exceptions.
     if (!empty($result->error)) {
       throw new HttpError($result);
