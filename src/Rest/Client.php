@@ -133,7 +133,7 @@ class Client {
     if (!empty($result->error)) {
       throw new HttpError($result);
     }
-    return drupal_json_decode($result->data);
+    return json_decode($result->data, TRUE, 512, JSON_THROW_ON_ERROR);
   }
 
   /**

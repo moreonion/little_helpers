@@ -30,4 +30,16 @@ class ClientTest extends DrupalUnitTestCase {
     $client->get('no-slash');
   }
 
+  /**
+   * Test handling invalid JSON responses.
+   */
+  public function testInvalidJson() {
+    $client = $this->mockClient();
+    $client->expects($this->once())->method('sendRequest')
+      ->with('https://example.com/', $this->anything())
+      ->willReturn((object) ['data' => '{invalid}']);
+    $this->expectException(\JsonException::class);
+    $client->get('');
+  }
+
 }
