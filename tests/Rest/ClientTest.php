@@ -42,4 +42,36 @@ class ClientTest extends DrupalUnitTestCase {
     $client->get('');
   }
 
+  /**
+   * Test decoding gzip compressed data.
+   */
+  public function testGzipResponse() {
+    $client = $this->mockClient();
+    $response = (object) [
+      'data' => gzencode('{"foo": 42}'),
+      'headers' => ['content-encoding' => 'gzip'],
+    ];
+    $client->expects($this->once())->method('sendRequest')
+      ->with('https://example.com/', $this->anything())
+      ->willReturn($response);
+    $result = $client->get('');
+    $this->assertEqual(["foo" => 42], $result);
+  }
+
+  /**
+   * Test decoding deflate compressed data.
+   */
+  public function testDeflateResponse() {
+    $client = $this->mockClient();
+    $response = (object) [
+      'data' => gzdeflate('{"foo": 42}'),
+      'headers' => ['content-encoding' => 'deflate'],
+    ];
+    $client->expects($this->once())->method('sendRequest')
+      ->with('https://example.com/', $this->anything())
+      ->willReturn($response);
+    $result = $client->get('');
+    $this->assertEqual(["foo" => 42], $result);
+  }
+
 }
