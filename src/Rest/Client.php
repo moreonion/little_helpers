@@ -109,6 +109,7 @@ class Client {
     if ($query) {
       $path .= '?' . http_build_query($query);
     }
+    $options += ['headers' => []];
 
     // Encode data if needed.
     if ($data) {
@@ -122,6 +123,9 @@ class Client {
 
     $url = $this->endpoint . $path;
     $options += $this->options;
+    $options['headers'] += [
+      'Accept-Encoding' => 'deflate, gzip',
+    ];
     $result = $this->sendRequest($url, $options);
 
     // Decode result data if compressed.

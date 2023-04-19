@@ -51,8 +51,11 @@ class ClientTest extends DrupalUnitTestCase {
       'data' => gzencode('{"foo": 42}'),
       'headers' => ['content-encoding' => 'gzip'],
     ];
+    $has_accept_encoding = function ($options) {
+      return $options['headers']['Accept-Encoding'] === 'deflate, gzip';
+    };
     $client->expects($this->once())->method('sendRequest')
-      ->with('https://example.com/', $this->anything())
+      ->with('https://example.com/', self::callback($has_accept_encoding))
       ->willReturn($response);
     $result = $client->get('');
     $this->assertEqual(["foo" => 42], $result);
