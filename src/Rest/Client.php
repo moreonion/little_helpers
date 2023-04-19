@@ -144,7 +144,10 @@ class Client {
     if (!empty($result->error)) {
       throw new HttpError($result);
     }
-    return json_decode($result->data, TRUE, 512, JSON_THROW_ON_ERROR);
+    if ($result->data) {
+      return json_decode($result->data, TRUE, 512, JSON_THROW_ON_ERROR);
+    }
+    return $result->data;
   }
 
   /**

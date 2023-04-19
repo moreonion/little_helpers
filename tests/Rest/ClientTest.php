@@ -77,4 +77,15 @@ class ClientTest extends DrupalUnitTestCase {
     $this->assertEqual(["foo" => 42], $result);
   }
 
+  /**
+   * Test response without data.
+   */
+  public function testEmptyResponse() {
+    $client = $this->mockClient();
+    $client->expects($this->once())->method('sendRequest')
+      ->with('https://example.com/', $this->anything())
+      ->willReturn((object) ['data' => '']);
+    $this->assertEmpty($client->get(''));
+  }
+
 }
