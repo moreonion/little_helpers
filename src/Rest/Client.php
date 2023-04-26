@@ -109,6 +109,7 @@ class Client {
     if ($query) {
       $path .= '?' . http_build_query($query);
     }
+    $options += ['headers' => []];
 
     // Encode data if needed.
     if ($data) {
@@ -122,13 +123,31 @@ class Client {
 
     $url = $this->endpoint . $path;
     $options += $this->options;
+    $options['headers'] += [
+      'Accept-Encoding' => 'deflate, gzip',
+    ];
     $result = $this->sendRequest($url, $options);
+
+    // Decode result data if compressed.
+    if ($encoding = $result->headers['content-encoding'] ?? '') {
+      if ($encoding == 'gzip') {
+        unset($result->headers['content-encoding']);
+        $result->data = gzdecode($result->data);
+      }
+      if ($encoding == 'deflate') {
+        unset($result->headers['content-encoding']);
+        $result->data = gzinflate($result->data);
+      }
+    }
 
     // Turn errors into exceptions.
     if (!empty($result->error)) {
       throw new HttpError($result);
     }
-    return drupal_json_decode($result->data);
+    if ($result->data) {
+      return json_decode($result->data, TRUE, 512, JSON_THROW_ON_ERROR);
+    }
+    return $result->data;
   }
 
   /**
