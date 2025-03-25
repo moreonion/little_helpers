@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        php-versions: ["7.4"]
+        php-versions: ["7.3", "7.4"]
     name: phpunit on PHP ${{ matrix.php-versions }}
     env:
       DB_DATABASE: drupal
@@ -25,6 +25,7 @@ jobs:
       run: |
         sudo systemctl start mysql
         mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+        mysql -e "ALTER USER '${{ env.DB_USER }}'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';" -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
     - name: Set env
       run: |
         echo "REPO=`pwd`" >> $GITHUB_ENV
@@ -34,7 +35,7 @@ jobs:
       id: composer-cache
       run: |
         echo "::set-output name=dir::$(composer config cache-files-dir)"
-    - uses: actions/cache@v2
+    - uses: actions/cache/restore@v4
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-
@@ -45,13 +46,18 @@ jobs:
         mkdir -p $COMPOSER_HOME
         cd $COMPOSER_HOME
         composer require drush/drush:8.3.* phpunit/phpunit:^8 torotil/upal:2.0.0-RC1
+    - name: Cache composer packages
+      id: composer-cache-write
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ runner.os }}-composer-
     - name: Bootstrap drupal
       run: |
         php -d sendmail_path=`which true` $COMPOSER_HOME/vendor/bin/drush.php --yes core-quick-drupal --core=drupal-7.82 --profile=testing --no-server --db-url=mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@127.0.0.1:3306/${{ env.DB_DATABASE }} --root=$ROOT
         ln -s $REPO $ROOT/sites/all/modules/module_under_test
         cd $ROOT
         curl https://www.drupal.org/files/issues/1891356-drupal_static_reset-on-module-changes-30-D7.patch | patch -p1
-        drush dl ctools psr0 views webform
+        drush dl ctools-1.21 psr0-1.6 views-3.29 webform-4.27
         drush --yes pm-enable little_helpers_test
     - name: Run phpunit tests
       run: UPAL_ROOT=$ROOT UPAL_WEB_URL=http://127.0.0.1 XDEBUG_MODE=coverage phpunit --bootstrap=$COMPOSER_HOME/vendor/torotil/upal/bootstrap.php --coverage-clover=coverage.xml .
