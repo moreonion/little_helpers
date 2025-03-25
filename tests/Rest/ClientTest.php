@@ -88,4 +88,19 @@ class ClientTest extends DrupalUnitTestCase {
     $this->assertEmpty($client->get(''));
   }
 
+  /**
+   * Test default options.
+   */
+  public function testDefaultOptions(): void  {
+    $options['headers']['Authorization'] = 'custom auth';
+    $client = $this->mockClient('https://example.com', $options);
+    $has_auth_header = function ($options) {
+      return $options['headers']['Authorization'] === 'custom auth';
+    };
+    $client->expects($this->once())->method('sendRequest')
+      ->with('https://example.com/', self::callback($has_auth_header))
+      ->willReturn((object) ['data' => '']);
+    $client->get('');
+  }
+
 }

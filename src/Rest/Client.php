@@ -2,6 +2,8 @@
 
 namespace Drupal\little_helpers\Rest;
 
+use Drupal\little_helpers\ArrayConfig;
+
 /**
  * This a simple JSON REST Client based on drupal_http_request().
  */
@@ -109,6 +111,7 @@ class Client {
     if ($query) {
       $path .= '?' . http_build_query($query);
     }
+    ArrayConfig::mergeDefaults($options, $this->options);
     $options += ['headers' => []];
 
     // Encode data if needed.
@@ -122,7 +125,6 @@ class Client {
     }
 
     $url = $this->endpoint . $path;
-    $options += $this->options;
     $options['headers'] += [
       'Accept-Encoding' => 'deflate, gzip',
     ];
